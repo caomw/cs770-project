@@ -1,0 +1,151 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_APP                 ICON                    "app.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_APP DIALOGEX 0, 0, 512, 436
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_CONTROLPARENT | WS_EX_APPWINDOW
+CAPTION "Hand Tracker"
+MENU IDR_MENU1
+CLASS "HandTrackerAppDlgWndClass"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_VIDEOVIEW,"Static",SS_BLACKFRAME,0,0,512,424
+    LTEXT           "",IDC_STATUS,0,425,512,11,SS_SUNKEN
+END
+
+IDD_FORMVIEW DIALOGEX 0, 0, 235, 87
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | WS_VISIBLE | WS_CAPTION
+EXSTYLE WS_EX_NOPARENTNOTIFY | WS_EX_TOOLWINDOW | WS_EX_WINDOWEDGE
+CAPTION "Network Options"
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_IP,93,15,89,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PORT,93,34,42,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Save",IDC_SAVE,63,58,50,14
+    PUSHBUTTON      "Cancel",IDC_CANCEL,120,58,50,14
+    LTEXT           "Port",IDC_STATIC,76,37,14,8
+    LTEXT           "IP Address",IDC_STATIC,53,18,36,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_APP, DIALOG
+    BEGIN
+    END
+
+    IDD_FORMVIEW, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 80
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""windows.h""\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU1 MENU
+BEGIN
+    POPUP "Options"
+    BEGIN
+        POPUP "Conrol Hand"
+        BEGIN
+            MENUITEM "Right",                       ID_CONROLHAND_RIGHT, CHECKED
+            MENUITEM "Left",                        ID_CONROLHAND_LEFT
+        END
+        MENUITEM "Network Settings",            ID_NETWORKSETTINGS
+        MENUITEM SEPARATOR
+        MENUITEM "Start",                       ID_START
+        MENUITEM "End",                         32783, INACTIVE
+    END
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
