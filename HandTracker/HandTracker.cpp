@@ -587,9 +587,18 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 									float oriZ = joint_orient[j].Orientation.z;
 									float oriW = joint_orient[j].Orientation.w;
 
+									int handState = -1;
+									if (controlHand == RIGHT)
+									{
+										handState = (int)rightHandState;
+									}
+									else if (controlHand == LEFT)
+									{
+										handState = (int)leftHandState;
+									}
 									// CONVERT TO STRING AND SEND VIA SOCKET
 									std::stringstream ss;
-									ss << posX << "," << posY << "," << posZ << "," << oriX << "," << oriY << "," << oriZ << "," << oriW << "\0";
+									ss << posX << "," << posY << "," << posZ << "," << oriX << "," << oriY << "," << oriZ << "," << oriW << "," << handState;
 									std::string& tmp = ss.str();
 
 									const char *msg = tmp.c_str();
