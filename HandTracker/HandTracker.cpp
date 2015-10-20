@@ -593,12 +593,11 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 									std::string& tmp = ss.str();
 
 									const char *msg = tmp.c_str();
-									char sendbuf[DEFAULT_BUFLEN];
-									memset(sendbuf, '\0', DEFAULT_BUFLEN);
-									memcpy(sendbuf, msg, strlen(msg));
-									int iResult = send(ConnectSocket, sendbuf, DEFAULT_BUFLEN, 0);
-									//const char *sendbuf = tmp.c_str();
-									//int iResult = send(ConnectSocket, msg, (int)strlen(msg), 0);
+									//char sendbuf[DEFAULT_BUFLEN];
+									//memset(sendbuf, '\0', DEFAULT_BUFLEN);
+									//memcpy(sendbuf, msg, strlen(msg));
+									//int iResult = send(ConnectSocket, sendbuf, DEFAULT_BUFLEN, 0);
+									int iResult = send(ConnectSocket, msg, (int)strlen(msg), 0);
 									if (iResult == SOCKET_ERROR) {
 										MessageBox(m_hWnd, L"Send data failed!", NULL, MB_OK | MB_ICONERROR);
 										closesocket(ConnectSocket);
