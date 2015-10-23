@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="HandPose.cpp" />
     <ClCompile Include="HandTracker.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -28,6 +29,7 @@
     <ResourceCompile Include="HandTracker.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="HandPose.h" />
     <ClInclude Include="HandTracker.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />

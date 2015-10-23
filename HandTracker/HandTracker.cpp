@@ -62,6 +62,7 @@ HandTracker::HandTracker() :
 	ipAddr(DEFAULT_IP),
 	port(DEFAULT_PORT),
 	ConnectSocket(INVALID_SOCKET),
+	m_handPoseTracker(NULL),
     m_pKinectSensor(NULL),
     m_pCoordinateMapper(NULL),
     m_pBodyFrameReader(NULL),
@@ -579,26 +580,50 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 									((controlHand == LEFT) && (j == JointType_HandLeft))) && 
 									(ConnectSocket != INVALID_SOCKET) )
 								{
-									float posX = joints[j].Position.X;
+									int handState = -1;
+									int otherHandState = -1;
+									if (controlHand == RIGHT)
+									{
+										handState = (int)rightHandState;
+										otherHandState = (int)leftHandState;
+									}
+									else if (controlHand == LEFT)
+									{
+										handState = (int)leftHandState;
+										otherHandState = (int)rightHandState;
+									}
+
+									if (m_handPoseTracker == NULL)
+									{
+										m_handPoseTracker = new HandPose(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
+											joint_orient[j].Orientation.x, joint_orient[j].Orientation.y, joint_orient[j].Orientation.z,
+											joint_orient[j].Orientation.w, handState);
+									}
+									else if (otherHandState == HandState_Lasso)
+									{
+										m_handPoseTracker->changeInitPose(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
+											joint_orient[j].Orientation.x, joint_orient[j].Orientation.y, joint_orient[j].Orientation.z,
+											joint_orient[j].Orientation.w, handState);
+									}
+									else
+									{
+										m_handPoseTracker->update(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
+											joint_orient[j].Orientation.x, joint_orient[j].Orientation.y, joint_orient[j].Orientation.z,
+											joint_orient[j].Orientation.w, handState);
+									}
+									/*float posX = joints[j].Position.X;
 									float posY = joints[j].Position.Y;
 									float posZ = joints[j].Position.Z;
 									float oriX = joint_orient[j].Orientation.x;
 									float oriY = joint_orient[j].Orientation.y;
 									float oriZ = joint_orient[j].Orientation.z;
-									float oriW = joint_orient[j].Orientation.w;
+									float oriW = joint_orient[j].Orientation.w;*/
 
-									int handState = -1;
-									if (controlHand == RIGHT)
-									{
-										handState = (int)rightHandState;
-									}
-									else if (controlHand == LEFT)
-									{
-										handState = (int)leftHandState;
-									}
+									
 									// CONVERT TO STRING AND SEND VIA SOCKET
 									std::stringstream ss;
-									ss << posX << "," << posY << "," << posZ << "," << oriX << "," << oriY << "," << oriZ << "," << oriW << "," << handState;
+									//ss << posX << "," << posY << "," << posZ << "," << oriX << "," << oriY << "," << oriZ << "," << oriW << "," << handState;
+									ss << *m_handPoseTracker;
 									std::string& tmp = ss.str();
 
 									const char *msg = tmp.c_str();
@@ -617,16 +642,8 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
                             }
 
                             DrawBody(joints, jointPoints);
-
-							if (controlHand == RIGHT)
-							{
-								DrawHand(rightHandState, jointPoints[JointType_HandRight]);
-							}
-							else if (controlHand == LEFT)
-							{
-								DrawHand(leftHandState, jointPoints[JointType_HandLeft]);
-							}
-                            
+							DrawHand(rightHandState, jointPoints[JointType_HandRight]);
+							DrawHand(leftHandState, jointPoints[JointType_HandLeft]);
                         }
                     }
                 }

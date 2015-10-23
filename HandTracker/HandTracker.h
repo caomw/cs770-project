@@ -8,6 +8,7 @@
 
 #include "resource.h"
 #include <winsock2.h>
+#include "HandPose.h"
 
 // additional macros
 //
@@ -88,6 +89,9 @@ private:
 
 	// network 
 	SOCKET ConnectSocket;
+
+	// hand pose tracker
+	HandPose*				m_handPoseTracker;
 
     // Current Kinect
     IKinectSensor*          m_pKinectSensor;

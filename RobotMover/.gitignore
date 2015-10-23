@@ -57,3 +57,11 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# linux tmp
+*.*~
+
+# ROS stuff
+[Ii]nstall/
+[Dd]evel/
+[Bb]uild/
