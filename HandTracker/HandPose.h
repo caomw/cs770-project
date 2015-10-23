@@ -21,6 +21,7 @@ class HandPose
 	int handState; // current hand state
 	int lastHandState;
 	int handStateDebounceCount; // noise filter
+	bool changedInit;
 public:
 	HandPose(float _pX, float _pY, float _pZ, float _oX, float _oY, float _oZ, float _oW, int _hS);
 	virtual ~HandPose();

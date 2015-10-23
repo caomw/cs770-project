@@ -37,16 +37,23 @@ HandPose::HandPose(float _pX, float _pY, float _pZ, float _oX, float _oY, float 
 	currentDisp[POS_X] = 0.0;
 	currentDisp[POS_Y] = 0.0;
 	currentDisp[POS_Z] = 0.0;
-	currentDisp[ORI_X] = 0.0;
+	/*currentDisp[ORI_X] = 0.0;
 	currentDisp[ORI_Y] = 0.0;
 	currentDisp[ORI_Z] = 0.0;
-	currentDisp[ORI_W] = 0.0;
+	currentDisp[ORI_W] = 0.0;*/
+	currentDisp[ORI_X] = (MASum[ORI_X] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_Y] = (MASum[ORI_Y] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_Z] = (MASum[ORI_Z] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_W] = (MASum[ORI_W] / MOVING_AVERAGE_WINDOW);
 
 	// inialize hand state
 
 	handState = _hS; // current hand state
 	lastHandState = _hS;
 	handStateDebounceCount = 0; // noise filter
+
+	// signal init set
+	changedInit = true;
 }
 
 
@@ -66,14 +73,19 @@ void HandPose::update(float _pX, float _pY, float _pZ, float _oX, float _oY, flo
 	MASum[ORI_Z] = MASum[ORI_Z] - MAQueue[ORI_Z].front() + _oZ;
 	MASum[ORI_W] = MASum[ORI_W] - MAQueue[ORI_W].front() + _oW;
 
+
 	// update displacements
 	currentDisp[POS_X] = poseInit[POS_X] - (MASum[POS_X] / MOVING_AVERAGE_WINDOW);
 	currentDisp[POS_Y] = poseInit[POS_Y] - (MASum[POS_Y] / MOVING_AVERAGE_WINDOW);
 	currentDisp[POS_Z] = poseInit[POS_Z] - (MASum[POS_Z] / MOVING_AVERAGE_WINDOW);
-	currentDisp[ORI_X] = poseInit[ORI_X] - (MASum[ORI_X] / MOVING_AVERAGE_WINDOW);
+	/*currentDisp[ORI_X] = poseInit[ORI_X] - (MASum[ORI_X] / MOVING_AVERAGE_WINDOW);
 	currentDisp[ORI_Y] = poseInit[ORI_Y] - (MASum[ORI_Y] / MOVING_AVERAGE_WINDOW);
 	currentDisp[ORI_Z] = poseInit[ORI_Z] - (MASum[ORI_Z] / MOVING_AVERAGE_WINDOW);
-	currentDisp[ORI_W] = poseInit[ORI_W] - (MASum[ORI_W] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_W] = poseInit[ORI_W] - (MASum[ORI_W] / MOVING_AVERAGE_WINDOW);*/
+	currentDisp[ORI_X] = (MASum[ORI_X] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_Y] = (MASum[ORI_Y] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_Z] = (MASum[ORI_Z] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_W] = (MASum[ORI_W] / MOVING_AVERAGE_WINDOW);
 
 	// update moving average queues
 	MAQueue[POS_X].pop();
@@ -109,6 +121,9 @@ void HandPose::update(float _pX, float _pY, float _pZ, float _oX, float _oY, flo
 		handStateDebounceCount = 0;
 	}
 	lastHandState = _hS;
+
+	// signal init set
+	changedInit = false;
 }
 
 void HandPose::changeInitPose(float _pX, float _pY, float _pZ, float _oX, float _oY, float _oZ, float _oW, int _hS)
@@ -160,16 +175,23 @@ void HandPose::changeInitPose(float _pX, float _pY, float _pZ, float _oX, float 
 	currentDisp[POS_X] = 0.0;
 	currentDisp[POS_Y] = 0.0;
 	currentDisp[POS_Z] = 0.0;
-	currentDisp[ORI_X] = 0.0;
+	/*currentDisp[ORI_X] = 0.0;
 	currentDisp[ORI_Y] = 0.0;
 	currentDisp[ORI_Z] = 0.0;
-	currentDisp[ORI_W] = 0.0;
+	currentDisp[ORI_W] = 0.0;*/
+	currentDisp[ORI_X] = (MASum[ORI_X] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_Y] = (MASum[ORI_Y] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_Z] = (MASum[ORI_Z] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_W] = (MASum[ORI_W] / MOVING_AVERAGE_WINDOW);
 
 	// inialize hand state
 
 	handState = _hS; // current hand state
 	lastHandState = _hS;
 	handStateDebounceCount = 0; // noise filter
+
+	// signal init set
+	changedInit = true;
 }
 
 /// <summary>
@@ -179,6 +201,6 @@ std::ostream& operator<<(std::ostream& os, const HandPose& dt)
 {
 	os << std::fixed << std::setprecision(2) << dt.currentDisp[POS_X] << "," << dt.currentDisp[POS_Y] << "," << dt.currentDisp[POS_Z]
 		<< "," << std::setprecision(5) << dt.currentDisp[ORI_X] << "," << dt.currentDisp[ORI_Y] << "," << dt.currentDisp[ORI_Z]
-		<< "," << dt.currentDisp[ORI_W] << "," << dt.handState;
+		<< "," << dt.currentDisp[ORI_W] << "," << dt.handState << "," << (dt.changedInit ? 1 : 0);
 	return os;
 }
