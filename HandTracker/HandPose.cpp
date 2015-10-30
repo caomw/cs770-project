@@ -201,6 +201,6 @@ std::ostream& operator<<(std::ostream& os, const HandPose& dt)
 {
 	os << std::fixed << std::setprecision(2) << dt.currentDisp[POS_X] << "," << dt.currentDisp[POS_Y] << "," << dt.currentDisp[POS_Z]
 		<< "," << std::setprecision(5) << dt.currentDisp[ORI_X] << "," << dt.currentDisp[ORI_Y] << "," << dt.currentDisp[ORI_Z]
-		<< "," << dt.currentDisp[ORI_W] << "," << dt.handState << "," << (dt.changedInit ? 1 : 0);
+		<< "," << dt.currentDisp[ORI_W] << "," << dt.handState << "|" << dt.poseInit[ORI_X] << "," << dt.poseInit[ORI_Y] << "," << dt.poseInit[ORI_Z] << "," << dt.poseInit[ORI_W];
 	return os;
 }
