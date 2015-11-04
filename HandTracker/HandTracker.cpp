@@ -62,6 +62,8 @@ HandTracker::HandTracker() :
 	ipAddr(DEFAULT_IP),
 	port(DEFAULT_PORT),
 	ConnectSocket(INVALID_SOCKET),
+	ptr(NULL),
+	ptr_length(0),
 	m_handPoseTracker(NULL),
     m_pKinectSensor(NULL),
     m_pCoordinateMapper(NULL),
@@ -362,8 +364,8 @@ LRESULT CALLBACK HandTracker::DlgProc(HWND hWnd, UINT message, WPARAM wParam, LP
 				// network start function... if success do these
 				WSADATA wsaData;
 				int iResult;
+				ptr = NULL;
 				struct addrinfo *result = NULL,
-					*ptr = NULL,
 					hints;
 
 				// Initialize Winsock
@@ -374,9 +376,9 @@ LRESULT CALLBACK HandTracker::DlgProc(HWND hWnd, UINT message, WPARAM wParam, LP
 				}
 
 				ZeroMemory(&hints, sizeof(hints));
-				hints.ai_family = AF_UNSPEC;
-				hints.ai_socktype = SOCK_STREAM;
-				hints.ai_protocol = IPPROTO_TCP;
+				hints.ai_family = AF_INET;
+				hints.ai_socktype = SOCK_DGRAM;
+				hints.ai_protocol = IPPROTO_UDP;
 
 				iResult = getaddrinfo(ipAddr, port, &hints, &result);
 				if (iResult != 0) {
@@ -399,12 +401,13 @@ LRESULT CALLBACK HandTracker::DlgProc(HWND hWnd, UINT message, WPARAM wParam, LP
 					}
 
 					// Connect to server.
-					iResult = connect(ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+					/*iResult = connect(ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
 					if (iResult == SOCKET_ERROR) {
 						closesocket(ConnectSocket);
 						ConnectSocket = INVALID_SOCKET;
 						continue;
-					}
+					}*/
+					ptr_length = sizeof(sockaddr_in);
 					break;
 				}
 
@@ -426,21 +429,22 @@ LRESULT CALLBACK HandTracker::DlgProc(HWND hWnd, UINT message, WPARAM wParam, LP
 				EnableMenuItem(pMenu, ID_END, MF_DISABLED | MF_BYCOMMAND);
 
 				// shutdown the send half of the connection since no more data will be sent
-				int iResult = shutdown(ConnectSocket, SD_SEND);
+				int iResult;
+				/*int iResult = shutdown(ConnectSocket, SD_SEND);
 				if (iResult == SOCKET_ERROR) {
 					MessageBox(m_hWnd, L"Socket shutdown failed!", NULL, MB_OK | MB_ICONERROR);
 					closesocket(ConnectSocket);
 					WSACleanup();
 					ConnectSocket = INVALID_SOCKET;
 					return 1;
-				}
+				}*/
 
 				// Receive until the peer closes the connection
-				char recvbuf[DEFAULT_BUFLEN];
+				/*char recvbuf[DEFAULT_BUFLEN];
 				int recvbuflen = DEFAULT_BUFLEN;
 				do {
 
-					iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+					iResult = recvfrom(ConnectSocket, recvbuf, recvbuflen, 0, ptr->ai_addr, &ptr_length);
 					if (iResult > 0)
 						printf("Bytes received: %d\n", iResult);
 					else if (iResult == 0)
@@ -448,13 +452,14 @@ LRESULT CALLBACK HandTracker::DlgProc(HWND hWnd, UINT message, WPARAM wParam, LP
 					else
 						printf("recv failed with error: %d\n", WSAGetLastError());
 
-				} while (iResult > 0);
+				} while (iResult > 0);*/
 
 				closesocket(ConnectSocket);
 				WSACleanup();
 
 				ConnectSocket = INVALID_SOCKET;
-
+				ptr = NULL;
+				ptr_length = 0;
 				// success
 				break;
 			}
@@ -568,9 +573,9 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
                         pBody->get_HandLeftState(&leftHandState);
                         pBody->get_HandRightState(&rightHandState);
 
-						pBody->GetJointOrientations(_countof(joint_orient), joint_orient);
+						HRESULT hrj = pBody->GetJointOrientations(_countof(joint_orient), joint_orient);
                         hr = pBody->GetJoints(_countof(joints), joints);
-                        if (SUCCEEDED(hr))
+						if (SUCCEEDED(hr) && SUCCEEDED(hrj))
                         {
 							for (int j = 0; j < _countof(joints); ++j)
 							{
@@ -627,18 +632,23 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 									std::string& tmp = ss.str();
 
 									const char *msg = tmp.c_str();
-									char sendbuf[DEFAULT_BUFLEN];
-									memset(sendbuf, ' ', DEFAULT_BUFLEN);
-									memcpy(sendbuf, msg, strlen(msg));
-									int iResult = send(ConnectSocket, sendbuf, DEFAULT_BUFLEN, 0);
+									//char sendbuf[DEFAULT_BUFLEN];
+									//memset(sendbuf, ' ', DEFAULT_BUFLEN);
+									//memcpy(sendbuf, msg, strlen(msg));
+									//int iResult = send(ConnectSocket, sendbuf, DEFAULT_BUFLEN, 0);
 									//std::cout << tmp << std::endl;
-									//int iResult = send(ConnectSocket, msg, (int)strlen(msg), 0);
+									int iResult = sendto(ConnectSocket, msg, (int)strlen(msg), 0, ptr->ai_addr, ptr_length);
 									if (iResult == SOCKET_ERROR) {
 										MessageBox(m_hWnd, L"Send data failed!", NULL, MB_OK | MB_ICONERROR);
 										closesocket(ConnectSocket);
 										WSACleanup();
 										ConnectSocket = INVALID_SOCKET;
 									}
+								}
+								else if (ConnectSocket == INVALID_SOCKET)
+								{
+									free(m_handPoseTracker);
+									m_handPoseTracker = NULL;
 								}
                             }
 

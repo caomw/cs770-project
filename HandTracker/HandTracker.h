@@ -89,6 +89,8 @@ private:
 
 	// network 
 	SOCKET ConnectSocket;
+	struct addrinfo *ptr;
+	int ptr_length;
 
 	// hand pose tracker
 	HandPose*				m_handPoseTracker;

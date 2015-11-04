@@ -12,32 +12,34 @@ class HandDataListener(SocketServer.BaseRequestHandler):
         :return: none
         """
         print("SocketServer received request from {}...".format(self.client_address[0]))
-        self.active = True
+        #self.active = True
 
     def handle(self):
         """
         Handle the data stream connection.
         :return: none
         """
-        while self.active:
-            self.data = self.request.recv(128).strip()
+        #while self.active:
+        #self.data = self.request.recv(128).strip()
+        self.data = self.request[0].strip()
 
-            if self.data == "":
-                self.active = False
-            else:
-                print("{} wrote: ".format(self.client_address[0]) + self.data)
+        #if self.data == "":
+        #    self.active = False
+        #else:
+        if self.data != "":
+            print("{} wrote: ".format(self.client_address[0]) + self.data)
 
-                # split data
-                splitData = self.data.split("|")
-                handDisp = splitData[0].split(",")
-                handRef = splitData[1]
+            # split data
+            #splitData = self.data.split("|")
+            #handDisp = splitData[0].split(",")
+            #handRef = splitData[1]
 
-                # update ref frame
-                if(handRef != ""):
-                    print("Updated Hand Ref: {}".format(str(handRef.split(","))))
+            # update ref frame
+            #if(handRef != ""):
+            #    print("Updated Hand Ref: {}".format(str(handRef.split(","))))
 
-                # update displacement
-                print("Hand Disp: {}".format(str(handDisp)))
+            # update displacement
+            #print("Hand Disp: {}".format(str(handDisp)))
 
     def finish(self):
         """
@@ -51,7 +53,7 @@ if __name__ == '__main__':
 
     # Create the server, binding to localhost on port 5050
     print("Starting SocketServer...")
-    server = SocketServer.TCPServer((HOST, PORT), HandDataListener)
+    server = SocketServer.UDPServer((HOST, PORT), HandDataListener)
 
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C

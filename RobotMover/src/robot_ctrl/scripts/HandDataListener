@@ -22,7 +22,6 @@ class HandDataListener(SocketServer.BaseRequestHandler):
         rospy.loginfo("SocketServer received request from {}...".format(self.client_address[0]))
         self.tf_broadcaster = tf.TransformBroadcaster()
         self.tf_listener = tf.TransformListener()
-        self.active = True
         self.KinectOriX = 0.0
         self.KinectOriY = 0.0
         self.KinectOriZ = 0.0
@@ -33,69 +32,57 @@ class HandDataListener(SocketServer.BaseRequestHandler):
         Handle the data stream connection.
         :return: none
         """
-        while self.active and not rospy.is_shutdown():
-            self.data = self.request.recv(128).strip()
+        self.data = self.request[0].strip()
+        if self.data != "":
+            rospy.loginfo("{} wrote: ".format(self.client_address[0]) + self.data)
 
-            if self.data == "":
-                self.active = False
-            else:
-                rospy.loginfo("{} wrote: ".format(self.client_address[0]) + self.data)
+            # split data
+            splitData = self.data.split("|")
+            handDisp = splitData[0].split(",")
+            handRef = splitData[1]
 
-                # split data
-                splitData = self.data.split("|")
-                handDisp = splitData[0].split(",")
-                handRef = splitData[1]
+            # update ref frame
+            if(handRef != ""):
+                try:
+                    t = getLatestCommonTime('mico_link_hand', 'root')
+                    (trans,rot) = self.tf_listener.lookupTransformFull('mico_link_hand', t, 'root', t, 'mico_api_origin')
+                except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+                    return
 
-                # update ref frame
-                if(handRef != ""):
-                    try:
-                        (trans,rot) = self.tf_listener.lookupTransform('mico_link_hand', 'mico_api_origin', rospy.Time(0))
-                    except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                        continue
+                # move Kinect sensor frame to ee
+                self.tf_broadcaster.sendTransform(trans,(self.KinectOriX,self.KinectOriY,self.KinectOriZ,self.KinectOriW),rospy.Time.now(),"kinect_frame","mico_api_origin")
 
-                    # move Kinect sensor frame to ee
-                    self.tf_broadcaster.sendTransform(trans,(self.KinectOriX,self.KinectOriY,self.KinectOriZ,self.KinectOriW),rospy.Time.now(),"kinect_frame","mico_api_origin")
-                    
-                    # update hand ref frame orientation
-                    ref_data = handRef.split(",")
-                    self.xOriRef = float(ref_data[0])
-                    self.yOriRef = float(ref_data[1])
-                    self.zOriRef = float(ref_data[2])
-                    self.wOriRef = float(ref_data[3])
-                    self.tf_broadcaster.sendTransform((0,0,0),(self.xOriRef,self.yOriRef,self.zOriRef,self.wOriRef),rospy.Time.now(),"hand_ref_frame","kinect_frame")
+                # update hand ref frame orientation
+                ref_data = handRef.split(",")
+                self.xOriRef = float(ref_data[0])
+                self.yOriRef = float(ref_data[1])
+                self.zOriRef = float(ref_data[2])
+                self.wOriRef = float(ref_data[3])
+                self.tf_broadcaster.sendTransform((0,0,0),(self.xOriRef,self.yOriRef,self.zOriRef,self.wOriRef),rospy.Time.now(),"hand_ref_frame","kinect_frame")
 
-                # update displacement
-                xPosDisp = float(handDisp[0])
-                yPosDisp = float(handDisp[1])
-                zPosDisp = float(handDisp[2])
-                xOriDisp = float(handDisp[3])
-                yOriDisp = float(handDisp[4])
-                zOriDisp = float(handDisp[5])
-                wOriDisp = float(handDisp[6])
-                handState = int(handDisp[7])
+            # update displacement
+            xPosDisp = float(handDisp[0])
+            yPosDisp = float(handDisp[1])
+            zPosDisp = float(handDisp[2])
+            xOriDisp = float(handDisp[3])
+            yOriDisp = float(handDisp[4])
+            zOriDisp = float(handDisp[5])
+            wOriDisp = float(handDisp[6])
+            handState = int(handDisp[7])
 
-                # calc tranform
-                q_disp = [xOriDisp, yOriDisp, zOriDisp, wOriDisp]
-                q_ref = [self.xOriRef, self.yOriRef, self.zOriRef, self.wOriRef]
-                q_ref_inv = tf.transformations.quaternion_inverse(q_ref)
-                q = tf.transformations.quaternion_multiply(q_ref_inv, q_disp)
-                self.tf_broadcaster.sendTransform((xPosDisp, yPosDisp, zPosDisp),(q[0],q[1],q[2],q[3]),rospy.Time.now(),"hand_disp_frame","hand_ref_frame")
-
-    def finish(self):
-        """
-        Clean up happens here (default does nothing).
-        :return: none
-        """
-        rospy.loginfo("SocketServer closed by {}...".format(self.client_address[0]))
-        if rospy.is_shutdown():
-            self.shutdown()
+            # calc tranform
+            q_disp = [xOriDisp, yOriDisp, zOriDisp, wOriDisp]
+            q_ref = [self.xOriRef, self.yOriRef, self.zOriRef, self.wOriRef]
+            q_ref_inv = tf.transformations.quaternion_inverse(q_ref)
+            q = tf.transformations.quaternion_multiply(q_ref_inv, q_disp)
+            self.tf_broadcaster.sendTransform((xPosDisp, yPosDisp, zPosDisp),(q[0],q[1],q[2],q[3]),rospy.Time.now(),"hand_disp_frame","hand_ref_frame")
 
 if __name__ == '__main__':
     HOST, PORT = "localhost", 5050
 
     # Create the server, binding to localhost on port 5050
     rospy.loginfo("Starting SocketServer...")
-    server = SocketServer.TCPServer((HOST, PORT), HandDataListener)
+    server = SocketServer.UDPServer((HOST, PORT), HandDataListener)
 
     # function to stop listening (requires new thread)
     def ROSShutdown():
