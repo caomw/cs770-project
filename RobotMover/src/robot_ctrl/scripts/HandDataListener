@@ -13,25 +13,24 @@ class HandDataListener(SocketServer.BaseRequestHandler):
     """
     The RequestHandler class for our server. Currently only echos received data. This need to be moved into a ROS node.
     """
-
-    def setup(self):
-        """
-        Initialization happens here (default does nothing).
-        :return: none
-        """
-        rospy.loginfo("SocketServer received request from {}...".format(self.client_address[0]))
-        self.tf_broadcaster = tf.TransformBroadcaster()
-        self.tf_listener = tf.TransformListener()
-        self.KinectOriX = 0.0
-        self.KinectOriY = 0.0
-        self.KinectOriZ = 0.0
-        self.KinectOriW = 1.0
-
     def handle(self):
         """
         Handle the data stream connection.
         :return: none
         """
+        global tf_broadcaster
+        global tf_listener
+        global KinectOriX
+        global KinectOriY
+        global KinectOriZ
+        global KinectOriW
+        global xOriRef
+        global yOriRef
+        global zOriRef
+        global wOriRef
+        global trans
+        global rot
+        
         self.data = self.request[0].strip()
         if self.data != "":
             rospy.loginfo("{} wrote: ".format(self.client_address[0]) + self.data)
@@ -42,25 +41,23 @@ class HandDataListener(SocketServer.BaseRequestHandler):
             handRef = splitData[1]
 
             # update ref frame
-            if(handRef != ""):
+            if(handRef != "") or (trans == 0) or (rot == 0):
                 try:
-                    t = getLatestCommonTime('mico_link_hand', 'root')
-                    (trans,rot) = self.tf_listener.lookupTransformFull('mico_link_hand', t, 'root', t, 'mico_api_origin')
+                    (trans,rot) = tf_listener.lookupTransform('/mico_api_origin','/mico_end_effector', rospy.Time())
                 except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
                     return
 
-                # move Kinect sensor frame to ee
-                self.tf_broadcaster.sendTransform(trans,(self.KinectOriX,self.KinectOriY,self.KinectOriZ,self.KinectOriW),rospy.Time.now(),"kinect_frame","mico_api_origin")
-
+            #if(handRef != ""):
                 # update hand ref frame orientation
-                ref_data = handRef.split(",")
-                self.xOriRef = float(ref_data[0])
-                self.yOriRef = float(ref_data[1])
-                self.zOriRef = float(ref_data[2])
-                self.wOriRef = float(ref_data[3])
-                self.tf_broadcaster.sendTransform((0,0,0),(self.xOriRef,self.yOriRef,self.zOriRef,self.wOriRef),rospy.Time.now(),"hand_ref_frame","kinect_frame")
+            #    ref_data = handRef.split(",")
+            #    xOriRef = float(ref_data[0])
+            #    yOriRef = float(ref_data[1])
+            #    zOriRef = float(ref_data[2])
+            #    wOriRef = float(ref_data[3])
 
             # update displacement
+            tf_broadcaster.sendTransform(trans,rot,rospy.Time.now(),"kinect_frame","mico_api_origin")
+            tf_broadcaster.sendTransform((0,0,0),(xOriRef,yOriRef,zOriRef,wOriRef),rospy.Time.now(),"hand_ref_frame","kinect_frame")
             xPosDisp = float(handDisp[0])
             yPosDisp = float(handDisp[1])
             zPosDisp = float(handDisp[2])
@@ -71,14 +68,15 @@ class HandDataListener(SocketServer.BaseRequestHandler):
             handState = int(handDisp[7])
 
             # calc tranform
-            q_disp = [xOriDisp, yOriDisp, zOriDisp, wOriDisp]
-            q_ref = [self.xOriRef, self.yOriRef, self.zOriRef, self.wOriRef]
-            q_ref_inv = tf.transformations.quaternion_inverse(q_ref)
-            q = tf.transformations.quaternion_multiply(q_ref_inv, q_disp)
-            self.tf_broadcaster.sendTransform((xPosDisp, yPosDisp, zPosDisp),(q[0],q[1],q[2],q[3]),rospy.Time.now(),"hand_disp_frame","hand_ref_frame")
+            #q_disp = [xOriDisp, yOriDisp, zOriDisp, wOriDisp]
+            #q_ref = [xOriRef, yOriRef, zOriRef, wOriRef]
+            #q_ref_inv = tf.transformations.quaternion_inverse(q_ref)
+            #q = tf.transformations.quaternion_multiply(q_ref_inv, q_disp)
+            #tf_broadcaster.sendTransform((xPosDisp, yPosDisp, zPosDisp),(q[0],q[1],q[2],q[3]),rospy.Time.now(),"hand_disp_frame","hand_ref_frame")
+            tf_broadcaster.sendTransform((-xPosDisp, yPosDisp, zPosDisp),(0,0,0,1),rospy.Time.now(),"hand_disp_frame","hand_ref_frame")
 
 if __name__ == '__main__':
-    HOST, PORT = "localhost", 5050
+    HOST, PORT = "192.168.1.100", 5050
 
     # Create the server, binding to localhost on port 5050
     rospy.loginfo("Starting SocketServer...")
@@ -97,6 +95,20 @@ if __name__ == '__main__':
     # start ROS node
     rospy.init_node('HandDataListener', anonymous=True)
     rospy.on_shutdown(ROSShutdown)
+
+    # TF items
+    tf_broadcaster = tf.TransformBroadcaster()
+    tf_listener = tf.TransformListener()
+    trans = 0
+    rot = 0
+    KinectOriX = 0.0
+    KinectOriY = 0.0
+    KinectOriZ = 0.0
+    KinectOriW = 1.0
+    xOriRef = 0.0
+    yOriRef = 0.0
+    zOriRef = 0.0
+    wOriRef = 1.0
 
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
