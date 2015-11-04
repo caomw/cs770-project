@@ -34,7 +34,7 @@ class HandDataListener(SocketServer.BaseRequestHandler):
         :return: none
         """
         while self.active and not rospy.is_shutdown():
-            self.data = self.request.recv(1024).strip()
+            self.data = self.request.recv(128).strip()
 
             if self.data == "":
                 self.active = False
@@ -43,13 +43,13 @@ class HandDataListener(SocketServer.BaseRequestHandler):
 
                 # split data
                 splitData = self.data.split("|")
-                handDisp = splitData[0]
+                handDisp = splitData[0].split(",")
                 handRef = splitData[1]
 
                 # update ref frame
                 if(handRef != ""):
                     try:
-                        (trans,rot) = self.tf_lookupTransform('mico_link_hand', 'mico_api_origin', rospy.Time(0))
+                        (trans,rot) = self.tf_listener.lookupTransform('mico_link_hand', 'mico_api_origin', rospy.Time(0))
                     except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
                         continue
 
