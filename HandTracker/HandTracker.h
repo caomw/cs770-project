@@ -9,6 +9,11 @@
 #include "resource.h"
 #include <winsock2.h>
 #include "HandPose.h"
+#include "stdafx.h"
+#include "VMG30.h"
+#include <string>
+#include <stdio.h>
+#include <windows.h>
 
 // additional macros
 //
@@ -94,6 +99,9 @@ private:
 
 	// hand pose tracker
 	HandPose*				m_handPoseTracker;
+
+	// Glove handle
+	VMG30HANDLE             m_gloveH;
 
     // Current Kinect
     IKinectSensor*          m_pKinectSensor;

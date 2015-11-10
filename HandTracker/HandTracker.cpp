@@ -20,6 +20,7 @@
 #pragma comment(lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
+#pragma comment (lib, "VMG30_SDK.lib")
 
 static const float c_JointThickness = 3.0f;
 static const float c_TrackedBoneThickness = 6.0f;
@@ -43,6 +44,9 @@ int APIENTRY wWinMain(
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
+
+	AllocConsole();
+	freopen("CONOUT$", "w", stdout);
 
     HandTracker application;
     application.Run(hInstance, nShowCmd);
@@ -78,6 +82,18 @@ HandTracker::HandTracker() :
     m_pBrushHandOpen(NULL),
     m_pBrushHandLasso(NULL)
 {
+	m_gloveH = GetVMGlove();
+	VMGloveSetConnPar(m_gloveH, 3, "192.168.2.212");
+	int comp;
+	char ip[VHAND_STRLEN];
+	VMGloveGetConnPar(m_gloveH, &comp, ip);
+
+	fprintf(stderr, "COMP:%d IP:%s\n", comp, ip);
+
+	std::cout << "hello" << std::endl;
+
+	VMGloveConnect(m_gloveH, CONN_USB, PKG_QUAT_FINGER);
+
     LARGE_INTEGER qpf = {0};
     if (QueryPerformanceFrequency(&qpf))
     {
@@ -582,9 +598,16 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 								jointPoints[j] = BodyToScreen(joints[j].Position, width, height);
 
 								if ((((controlHand == RIGHT) && (j == JointType_HandRight)) ||
-									((controlHand == LEFT) && (j == JointType_HandLeft))) && 
-									(ConnectSocket != INVALID_SOCKET) )
+									((controlHand == LEFT) && (j == JointType_HandLeft))) /*&& 
+									(ConnectSocket != INVALID_SOCKET)*/ )
 								{
+
+									int cs = VMGloveGetConnectionStatus(m_gloveH);
+									fprintf(stdout, "CONNSTATUS: %d\n", cs);
+									double quat1, quat2, quat3, quat4;
+									VMGloveGetQuaternionHand(m_gloveH, &quat1, &quat2, &quat3, &quat4);
+									fprintf(stdout, "%f", "%f", "%f", "%f");
+
 									int handState = -1;
 									int otherHandState = -1;
 									if (controlHand == RIGHT)
@@ -601,20 +624,17 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 									if (m_handPoseTracker == NULL)
 									{
 										m_handPoseTracker = new HandPose(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
-											joint_orient[j].Orientation.x, joint_orient[j].Orientation.y, joint_orient[j].Orientation.z,
-											joint_orient[j].Orientation.w, handState);
+											quat1, quat2, quat3, quat4, handState);
 									}
 									else if (otherHandState == HandState_Lasso)
 									{
 										m_handPoseTracker->changeInitPose(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
-											joint_orient[j].Orientation.x, joint_orient[j].Orientation.y, joint_orient[j].Orientation.z,
-											joint_orient[j].Orientation.w, handState);
+											quat1, quat2, quat3, quat4, handState);
 									}
 									else
 									{
 										m_handPoseTracker->update(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
-											joint_orient[j].Orientation.x, joint_orient[j].Orientation.y, joint_orient[j].Orientation.z,
-											joint_orient[j].Orientation.w, handState);
+											quat1, quat2, quat3, quat4, handState);
 									}
 									/*float posX = joints[j].Position.X;
 									float posY = joints[j].Position.Y;
@@ -624,7 +644,12 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 									float oriZ = joint_orient[j].Orientation.z;
 									float oriW = joint_orient[j].Orientation.w;*/
 
+									// overwrite m_handPoseTracker orientation using glove data here...
+
 									
+									////////////////////////////
+								
+
 									// CONVERT TO STRING AND SEND VIA SOCKET
 									std::stringstream ss;
 									//ss << posX << "," << posY << "," << posZ << "," << oriX << "," << oriY << "," << oriZ << "," << oriW << "," << handState;
@@ -650,6 +675,7 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 									free(m_handPoseTracker);
 									m_handPoseTracker = NULL;
 								}
+
                             }
 
                             DrawBody(joints, jointPoints);
