@@ -598,8 +598,8 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 								jointPoints[j] = BodyToScreen(joints[j].Position, width, height);
 
 								if ((((controlHand == RIGHT) && (j == JointType_HandRight)) ||
-									((controlHand == LEFT) && (j == JointType_HandLeft))) /*&& 
-									(ConnectSocket != INVALID_SOCKET)*/ )
+									((controlHand == LEFT) && (j == JointType_HandLeft))) && 
+									(ConnectSocket != INVALID_SOCKET) )
 								{
 
 									int cs = VMGloveGetConnectionStatus(m_gloveH);
