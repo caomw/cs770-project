@@ -1,0 +1,31 @@
+#!/usr/bin/env python  
+
+import roslib
+import rospy
+import tf
+from std_msgs.msg import Bool
+
+def handle_change(msg):
+    global trans
+    global rot
+    if msg.data:
+        try:
+            (trans,rot) = tf_listener.lookupTransform('/mico_api_origin','/mico_end_effector', rospy.Time())
+        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+            return
+        
+if __name__ == '__main__':
+    topicName = "RefChange"
+    frameName = "kinect_frame"
+    parentName = "mico_api_origin"
+    trans = (0.0,0.0,0.0)
+    rot = (0.0,0.0,0.0,1.0)
+
+    rospy.init_node('kinectBroadcaster', anonymous=True)
+    rospy.Subscriber(topicName,Bool,handle_change)
+
+    br = tf.TransformBroadcaster()
+    rate = rospy.Rate(10.0)
+    while not rospy.is_shutdown():
+        br.sendTransform(trans,rot,rospy.Time.now(),frameName,parentName)
+        rate.sleep()

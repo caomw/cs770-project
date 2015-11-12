@@ -2,10 +2,9 @@
 
 import SocketServer
 import rospy
-import copy
 import thread
 from geometry_msgs.msg import Pose
-#from std_msgs.msg import Int8
+from std_msgs.msg import Bool
 
 class HandDataListener(SocketServer.BaseRequestHandler):
     """
@@ -23,7 +22,8 @@ class HandDataListener(SocketServer.BaseRequestHandler):
             # split data
             splitData = self.data.split("|")
             handDisp = splitData[0].split(",")
-            handRef = splitData[1]
+            handRef = splitData[1].split(",")
+            refChange = splitData[2]
 
             # publish new hand pose
             newPose = Pose()
@@ -36,13 +36,23 @@ class HandDataListener(SocketServer.BaseRequestHandler):
             newPose.orientation.w = float(handDisp[6])
             hand_pose_pub.publish(newPose)
             
-            # update ref frame
-            if(handRef == "True"):
-                refPose = copy.deepcopy(newPose)
-                refPose.position.x = 0.0
-                refPose.position.y = 0.0
-                refPose.position.z = 0.0
-                ref_pose_pub.publish(refPose)
+            # publish new ref pose
+            newRefPose = Pose()
+            newRefPose.position.x = 0.0
+            newRefPose.position.y = 0.0
+            newRefPose.position.z = 0.0
+            newRefPose.orientation.x = float(handRef[0])
+            newRefPose.orientation.y = float(handRef[1])
+            newRefPose.orientation.z = float(handRef[2])
+            newRefPose.orientation.w = float(handRef[3])
+            ref_pose_pub.publish(newRefPose)
+            
+            # change ref frame?
+            update = False
+            if(refChange == "True"):
+                update = True
+            ref_change_pub.publish(Bool(update))
+                
                 
 
 if __name__ == '__main__':
@@ -67,7 +77,8 @@ if __name__ == '__main__':
     rospy.init_node('HandDataListener', anonymous=True)
     rospy.on_shutdown(ROSShutdown)
     hand_pose_pub = rospy.Publisher('HandPose', Pose, queue_size=50)
-    ref_pose_pub = rospy.Publisher('HandRef', Pose, queue_size=50)
+    ref_pose_pub = rospy.Publisher('RefPose', Pose, queue_size=50)
+    ref_change_pub = rospy.Publisher('RefChange', Bool, queue_size=50)
 
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C

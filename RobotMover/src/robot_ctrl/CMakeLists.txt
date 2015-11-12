@@ -143,6 +143,9 @@ include_directories(
 ## Executable python scripts (use this according to documentation!)
 catkin_install_python(PROGRAMS 
   scripts/HandDataListener
+  scripts/kinectBroadcaster
+  scripts/refBroadcaster
+  scripts/handBroadcaster
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
