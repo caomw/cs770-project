@@ -1,4 +1,0 @@
-#!/usr/bin/env python
-import robot_ctrl
-if __name__ == '__main__':
-    robot_ctrl.__main__()

@@ -3,6 +3,7 @@
 import SocketServer
 import rospy
 import copy
+import thread
 from geometry_msgs.msg import Pose
 #from std_msgs.msg import Int8
 
@@ -25,14 +26,14 @@ class HandDataListener(SocketServer.BaseRequestHandler):
             handRef = splitData[1]
 
             # publish new hand pose
-            newPose = geometry_msgs.msg.Pose()
-            newPose.position.x = float(split_data[0])
-            newPose.position.y = float(split_data[1])
-            newPose.position.z = float(split_data[2])
-            newPose.orientation.x = float(split_data[3])
-            newPose.orientation.y = float(split_data[4])
-            newPose.orientation.z = float(split_data[5])
-            newPose.orientation.w = float(split_data[6])
+            newPose = Pose()
+            newPose.position.x = float(handDisp[0])
+            newPose.position.y = float(handDisp[1])
+            newPose.position.z = float(handDisp[2])
+            newPose.orientation.x = float(handDisp[3])
+            newPose.orientation.y = float(handDisp[4])
+            newPose.orientation.z = float(handDisp[5])
+            newPose.orientation.w = float(handDisp[6])
             hand_pose_pub.publish(newPose)
             
             # update ref frame
@@ -45,7 +46,7 @@ class HandDataListener(SocketServer.BaseRequestHandler):
                 
 
 if __name__ == '__main__':
-    HOST, PORT = "192.168.1.100", 5050
+    HOST, PORT = "192.168.1.102", 5050
 
     # Create the server, binding to localhost on port 5050
     rospy.loginfo("Starting SocketServer...")
@@ -54,8 +55,8 @@ if __name__ == '__main__':
     # function to stop listening (requires new thread)
     def ROSShutdown():
         rospy.loginfo("Attempting shutdown of SocketServer...")
-        hand_pose_pub.unregister()
-        ref_pose_pub.unregister()
+        #hand_pose_pub.unregister()
+        #ref_pose_pub.unregister()
         def StopSocketListener(_s):
             _s.shutdown()
             
