@@ -10,7 +10,7 @@ def handle_change(msg):
     global rot
     if msg.data:
         try:
-            (trans,rot) = tf_listener.lookupTransform('/mico_api_origin','/mico_end_effector', rospy.Time())
+            (trans,rot) = li.lookupTransform('/mico_api_origin','/mico_end_effector', rospy.Time())
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             return
         
@@ -20,10 +20,20 @@ if __name__ == '__main__':
     parentName = "mico_api_origin"
     trans = (0.0,0.0,0.0)
     rot = (0.0,0.0,0.0,1.0)
-
+    
     rospy.init_node('kinectBroadcaster', anonymous=True)
-    rospy.Subscriber(topicName,Bool,handle_change)
 
+    li = tf.TransformListener()
+    # find initial trans,rot
+    waiting = True
+    while waiting:
+        try:
+            (trans,rot) = li.lookupTransform('/mico_api_origin','/mico_end_effector', rospy.Time())
+            waiting = False
+        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+            continue
+    
+    rospy.Subscriber(topicName,Bool,handle_change, queue_size=50)
     br = tf.TransformBroadcaster()
     rate = rospy.Rate(10.0)
     while not rospy.is_shutdown():

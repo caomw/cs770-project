@@ -23,5 +23,5 @@ if __name__ == '__main__':
     frameName = "hand_disp_frame"
     parentName = "hand_ref_frame"
     rospy.init_node('handBroadcaster', anonymous=True)
-    rospy.Subscriber(topicName,Pose,handle_pose,frameName,parentName)
+    rospy.Subscriber(topicName,Pose,handle_pose,frameName,parentName, queue_size=50)
     rospy.spin()
