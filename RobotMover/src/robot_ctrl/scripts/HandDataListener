@@ -3,6 +3,7 @@
 import SocketServer
 import rospy
 import thread
+import tf
 from geometry_msgs.msg import Pose
 from std_msgs.msg import Bool
 
@@ -25,27 +26,32 @@ class HandDataListener(SocketServer.BaseRequestHandler):
             handRef = splitData[1].split(",")
             refChange = splitData[2]
 
+            qWrist = [float(handRef[0]), float(handRef[1]), float(handRef[2]), float(handRef[3])]
+            qHand = [float(handDisp[3]), float(handDisp[4]), float(handDisp[5]), float(handDisp[6])]
+            #q_ref_inv = tf.transformations.quaternion_inverse(q_ref)
+            q = tf.transformations.quaternion_multiply(qHand,qWrist)
+
             # publish new hand pose
             newPose = Pose()
             newPose.position.x = float(handDisp[0])
             newPose.position.y = float(handDisp[1])
             newPose.position.z = float(handDisp[2])
-            newPose.orientation.x = float(handDisp[3])
-            newPose.orientation.y = float(handDisp[4])
-            newPose.orientation.z = float(handDisp[5])
-            newPose.orientation.w = float(handDisp[6])
+            newPose.orientation.x = q[0]
+            newPose.orientation.y = q[1]
+            newPose.orientation.z = q[2]
+            newPose.orientation.w = q[3]
             hand_pose_pub.publish(newPose)
             
             # publish new ref pose
-            newRefPose = Pose()
-            newRefPose.position.x = 0.0
-            newRefPose.position.y = 0.0
-            newRefPose.position.z = 0.0
-            newRefPose.orientation.x = float(handRef[0])
-            newRefPose.orientation.y = float(handRef[1])
-            newRefPose.orientation.z = float(handRef[2])
-            newRefPose.orientation.w = float(handRef[3])
-            ref_pose_pub.publish(newRefPose)
+            #newRefPose = Pose()
+            #newRefPose.position.x = 0.0
+            #newRefPose.position.y = 0.0
+            #newRefPose.position.z = 0.0
+            #newRefPose.orientation.x = 
+            #newRefPose.orientation.y = float(handRef[1])
+            #newRefPose.orientation.z = float(handRef[2])
+            #newRefPose.orientation.w = float(handRef[3])
+            #ref_pose_pub.publish(newRefPose)
             
             # change ref frame?
             update = False
@@ -56,7 +62,7 @@ class HandDataListener(SocketServer.BaseRequestHandler):
                 
 
 if __name__ == '__main__':
-    HOST, PORT = "192.168.1.102", 5050
+    HOST, PORT = "192.168.1.101", 5050
 
     # Create the server, binding to localhost on port 5050
     rospy.loginfo("Starting SocketServer...")
@@ -76,9 +82,9 @@ if __name__ == '__main__':
     # start ROS node and publishers
     rospy.init_node('HandDataListener', anonymous=True)
     rospy.on_shutdown(ROSShutdown)
-    hand_pose_pub = rospy.Publisher('HandPose', Pose, queue_size=50)
-    ref_pose_pub = rospy.Publisher('RefPose', Pose, queue_size=50)
-    ref_change_pub = rospy.Publisher('RefChange', Bool, queue_size=50)
+    hand_pose_pub = rospy.Publisher('HandPose', Pose, queue_size=10)
+    #ref_pose_pub = rospy.Publisher('RefPose', Pose, queue_size=10)
+    ref_change_pub = rospy.Publisher('RefChange', Bool, queue_size=10)
 
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C

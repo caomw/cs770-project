@@ -5,12 +5,7 @@ import rospy
 import tf
 from geometry_msgs.msg import Pose
 
-def handle_pose(msg, fName,pName):
-    try:
-        li = tf.TransformListener()
-        li.waitForTransform(pName, "kinect_frame", rospy.Time(), rospy.Duration(0.5))
-    except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-        return
+def handle_pose(msg, (fName,pName)):
     br = tf.TransformBroadcaster()
     br.sendTransform((-msg.position.x, msg.position.y, msg.position.z),
         (msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w),
@@ -21,7 +16,7 @@ def handle_pose(msg, fName,pName):
 if __name__ == '__main__':
     topicName = 'HandPose'
     frameName = "hand_disp_frame"
-    parentName = "hand_ref_frame"
+    parentName = "kinect_frame"
     rospy.init_node('handBroadcaster', anonymous=True)
-    rospy.Subscriber(topicName,Pose,handle_pose,frameName,parentName, queue_size=50)
+    rospy.Subscriber(topicName,Pose,handle_pose,(frameName,parentName), queue_size=10)
     rospy.spin()

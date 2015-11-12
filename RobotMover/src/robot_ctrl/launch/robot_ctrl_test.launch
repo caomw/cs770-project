@@ -18,7 +18,6 @@
     
     <!-- Launch TF Broadcasters -->
     <node name="kinectBroadcaster" pkg="robot_ctrl" type="kinectBroadcaster" output="screen" />
-    <node name="refBroadcaster" pkg="robot_ctrl" type="refBroadcaster" output="screen" />
 	<node name="handBroadcaster" pkg="robot_ctrl" type="handBroadcaster" output="screen" />
     
 </launch>

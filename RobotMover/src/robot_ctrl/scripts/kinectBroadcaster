@@ -33,7 +33,7 @@ if __name__ == '__main__':
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             continue
     
-    rospy.Subscriber(topicName,Bool,handle_change, queue_size=50)
+    rospy.Subscriber(topicName,Bool,handle_change, queue_size=10)
     br = tf.TransformBroadcaster()
     rate = rospy.Rate(10.0)
     while not rospy.is_shutdown():

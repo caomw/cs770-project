@@ -5,15 +5,11 @@ import rospy
 import tf
 from geometry_msgs.msg import Pose
 
-def handle_pose(msg, fName, pName):
-    try:
-        li = tf.TransformListener()
-        li.waitForTransform(pName, "mico_api_origin", rospy.Time(), rospy.Duration(0.5))
-    except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-        return
+def handle_pose(msg, (fName, pName)):
     br = tf.TransformBroadcaster()
     br.sendTransform((0.0,0.0,0.0),
-        (msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w),
+        #(msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w),
+        (0.0, 0.0, 0.0, 1.0),
         rospy.Time.now(),
         fName,
         pName)
@@ -23,5 +19,5 @@ if __name__ == '__main__':
     frameName = "hand_ref_frame"
     parentName = "kinect_frame"
     rospy.init_node('redBroadcaster', anonymous=True)
-    rospy.Subscriber(topicName,Pose,handle_pose,frameName,parentName, queue_size=50)
+    rospy.Subscriber(topicName,Pose,handle_pose,(frameName,parentName), queue_size=10)
     rospy.spin()
