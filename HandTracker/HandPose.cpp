@@ -1,7 +1,7 @@
 #include "HandPose.h"
 #include <iomanip>      // std::setprecision
 
-HandPose::HandPose(float _pX, float _pY, float _pZ, float _oX, float _oY, float _oZ, float _oW, int _hS)
+HandPose::HandPose(float _pX, float _pY, float _pZ, float _oX, float _oY, float _oZ, float _oW, float _oWX, float _oWY, float _oWZ, float _oWW, int _hS)
 {
 	// set initial positions
 	poseInit[POS_X] = _pX;
@@ -11,6 +11,11 @@ HandPose::HandPose(float _pX, float _pY, float _pZ, float _oX, float _oY, float 
 	poseInit[ORI_Y] = _oY;
 	poseInit[ORI_Z] = _oZ;
 	poseInit[ORI_W] = _oW;
+	poseInit[ORI_WX] = _oWX;
+	poseInit[ORI_WY] = _oWY;
+	poseInit[ORI_WZ] = _oWZ;
+	poseInit[ORI_WW] = _oWW;
+
 
 	// inialize moving averages
 	MASum[POS_X] = _pX * MOVING_AVERAGE_WINDOW;
@@ -20,6 +25,10 @@ HandPose::HandPose(float _pX, float _pY, float _pZ, float _oX, float _oY, float 
 	MASum[ORI_Y] = _oY * MOVING_AVERAGE_WINDOW;
 	MASum[ORI_Z] = _oZ * MOVING_AVERAGE_WINDOW;
 	MASum[ORI_W] = _oW * MOVING_AVERAGE_WINDOW;
+	MASum[ORI_WX] = _oWX * MOVING_AVERAGE_WINDOW;
+	MASum[ORI_WY] = _oWY * MOVING_AVERAGE_WINDOW;
+	MASum[ORI_WZ] = _oWZ * MOVING_AVERAGE_WINDOW;
+	MASum[ORI_WW] = _oWW * MOVING_AVERAGE_WINDOW;
 
 	for (int i = 0; i < MOVING_AVERAGE_WINDOW; i++)
 	{
@@ -30,6 +39,10 @@ HandPose::HandPose(float _pX, float _pY, float _pZ, float _oX, float _oY, float 
 		MAQueue[ORI_Y].push(_oY);
 		MAQueue[ORI_Z].push(_oZ);
 		MAQueue[ORI_W].push(_oW);
+		MAQueue[ORI_WX].push(_oWX);
+		MAQueue[ORI_WY].push(_oWY);
+		MAQueue[ORI_WZ].push(_oWZ);
+		MAQueue[ORI_WW].push(_oWW);
 	}
 
 	// initialize displacements
@@ -45,6 +58,10 @@ HandPose::HandPose(float _pX, float _pY, float _pZ, float _oX, float _oY, float 
 	currentDisp[ORI_Y] = (MASum[ORI_Y] / MOVING_AVERAGE_WINDOW);
 	currentDisp[ORI_Z] = (MASum[ORI_Z] / MOVING_AVERAGE_WINDOW);
 	currentDisp[ORI_W] = (MASum[ORI_W] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_WX] = (MASum[ORI_WX] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_WY] = (MASum[ORI_WY] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_WZ] = (MASum[ORI_WZ] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_WW] = (MASum[ORI_WW] / MOVING_AVERAGE_WINDOW);
 
 	// inialize hand state
 
@@ -62,7 +79,7 @@ HandPose::~HandPose()
 
 }
 
-void HandPose::update(float _pX, float _pY, float _pZ, float _oX, float _oY, float _oZ, float _oW, int _hS)
+void HandPose::update(float _pX, float _pY, float _pZ, float _oX, float _oY, float _oZ, float _oW, float _oWX, float _oWY, float _oWZ, float _oWW, int _hS)
 {
 	// update moving average sums
 	MASum[POS_X] = MASum[POS_X] - MAQueue[POS_X].front() + _pX;
@@ -72,6 +89,10 @@ void HandPose::update(float _pX, float _pY, float _pZ, float _oX, float _oY, flo
 	MASum[ORI_Y] = MASum[ORI_Y] - MAQueue[ORI_Y].front() + _oY;
 	MASum[ORI_Z] = MASum[ORI_Z] - MAQueue[ORI_Z].front() + _oZ;
 	MASum[ORI_W] = MASum[ORI_W] - MAQueue[ORI_W].front() + _oW;
+	MASum[ORI_WX] = MASum[ORI_WX] - MAQueue[ORI_WX].front() + _oWX;
+	MASum[ORI_WY] = MASum[ORI_WY] - MAQueue[ORI_WY].front() + _oWY;
+	MASum[ORI_WZ] = MASum[ORI_WZ] - MAQueue[ORI_WZ].front() + _oWZ;
+	MASum[ORI_WW] = MASum[ORI_WW] - MAQueue[ORI_WW].front() + _oWW;
 
 
 	// update displacements
@@ -86,6 +107,10 @@ void HandPose::update(float _pX, float _pY, float _pZ, float _oX, float _oY, flo
 	currentDisp[ORI_Y] = (MASum[ORI_Y] / MOVING_AVERAGE_WINDOW);
 	currentDisp[ORI_Z] = (MASum[ORI_Z] / MOVING_AVERAGE_WINDOW);
 	currentDisp[ORI_W] = (MASum[ORI_W] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_WX] = (MASum[ORI_WX] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_WY] = (MASum[ORI_WY] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_WZ] = (MASum[ORI_WZ] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_WW] = (MASum[ORI_WW] / MOVING_AVERAGE_WINDOW);
 
 	// update moving average queues
 	MAQueue[POS_X].pop();
@@ -95,6 +120,10 @@ void HandPose::update(float _pX, float _pY, float _pZ, float _oX, float _oY, flo
 	MAQueue[ORI_Y].pop();
 	MAQueue[ORI_Z].pop();
 	MAQueue[ORI_W].pop();
+	MAQueue[ORI_WX].pop();
+	MAQueue[ORI_WY].pop();
+	MAQueue[ORI_WZ].pop();
+	MAQueue[ORI_WW].pop();
 	MAQueue[POS_X].push(_pX);
 	MAQueue[POS_Y].push(_pY);
 	MAQueue[POS_Z].push(_pZ);
@@ -102,6 +131,10 @@ void HandPose::update(float _pX, float _pY, float _pZ, float _oX, float _oY, flo
 	MAQueue[ORI_Y].push(_oY);
 	MAQueue[ORI_Z].push(_oZ);
 	MAQueue[ORI_W].push(_oW);
+	MAQueue[ORI_WX].push(_oWX);
+	MAQueue[ORI_WY].push(_oWY);
+	MAQueue[ORI_WZ].push(_oWZ);
+	MAQueue[ORI_WW].push(_oWW);
 
 	// debounce hand state
 	if (_hS == lastHandState)
@@ -126,7 +159,7 @@ void HandPose::update(float _pX, float _pY, float _pZ, float _oX, float _oY, flo
 	changedInit = false;
 }
 
-void HandPose::changeInitPose(float _pX, float _pY, float _pZ, float _oX, float _oY, float _oZ, float _oW, int _hS)
+void HandPose::changeInitPose(float _pX, float _pY, float _pZ, float _oX, float _oY, float _oZ, float _oW, float _oWX, float _oWY, float _oWZ, float _oWW, int _hS)
 {
 	// set initial positions
 	poseInit[POS_X] = _pX;
@@ -136,6 +169,10 @@ void HandPose::changeInitPose(float _pX, float _pY, float _pZ, float _oX, float 
 	poseInit[ORI_Y] = _oY;
 	poseInit[ORI_Z] = _oZ;
 	poseInit[ORI_W] = _oW;
+	poseInit[ORI_WX] = _oWX;
+	poseInit[ORI_WY] = _oWY;
+	poseInit[ORI_WZ] = _oWZ;
+	poseInit[ORI_WW] = _oWW;
 
 	// inialize moving averages
 	MASum[POS_X] = _pX * MOVING_AVERAGE_WINDOW;
@@ -145,6 +182,10 @@ void HandPose::changeInitPose(float _pX, float _pY, float _pZ, float _oX, float 
 	MASum[ORI_Y] = _oY * MOVING_AVERAGE_WINDOW;
 	MASum[ORI_Z] = _oZ * MOVING_AVERAGE_WINDOW;
 	MASum[ORI_W] = _oW * MOVING_AVERAGE_WINDOW;
+	MASum[ORI_WX] = _oWX * MOVING_AVERAGE_WINDOW;
+	MASum[ORI_WY] = _oWY * MOVING_AVERAGE_WINDOW;
+	MASum[ORI_WZ] = _oWZ * MOVING_AVERAGE_WINDOW;
+	MASum[ORI_WW] = _oWW * MOVING_AVERAGE_WINDOW;
 
 	// clear queue
 	for (int i = 0; i < MOVING_AVERAGE_WINDOW; i++)
@@ -156,6 +197,10 @@ void HandPose::changeInitPose(float _pX, float _pY, float _pZ, float _oX, float 
 		MAQueue[ORI_Y].pop();
 		MAQueue[ORI_Z].pop();
 		MAQueue[ORI_W].pop();
+		MAQueue[ORI_WX].pop();
+		MAQueue[ORI_WY].pop();
+		MAQueue[ORI_WZ].pop();
+		MAQueue[ORI_WW].pop();
 	}
 
 	//rebuild queue
@@ -168,6 +213,10 @@ void HandPose::changeInitPose(float _pX, float _pY, float _pZ, float _oX, float 
 		MAQueue[ORI_Y].push(_oY);
 		MAQueue[ORI_Z].push(_oZ);
 		MAQueue[ORI_W].push(_oW);
+		MAQueue[ORI_WX].push(_oWX);
+		MAQueue[ORI_WY].push(_oWY);
+		MAQueue[ORI_WZ].push(_oWZ);
+		MAQueue[ORI_WW].push(_oWW);
 	}
 
 	// initialize displacements
@@ -183,6 +232,10 @@ void HandPose::changeInitPose(float _pX, float _pY, float _pZ, float _oX, float 
 	currentDisp[ORI_Y] = (MASum[ORI_Y] / MOVING_AVERAGE_WINDOW);
 	currentDisp[ORI_Z] = (MASum[ORI_Z] / MOVING_AVERAGE_WINDOW);
 	currentDisp[ORI_W] = (MASum[ORI_W] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_WX] = (MASum[ORI_WX] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_WY] = (MASum[ORI_WY] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_WZ] = (MASum[ORI_WZ] / MOVING_AVERAGE_WINDOW);
+	currentDisp[ORI_WW] = (MASum[ORI_WW] / MOVING_AVERAGE_WINDOW);
 
 	// inialize hand state
 
@@ -201,14 +254,15 @@ std::ostream& operator<<(std::ostream& os, const HandPose& dt)
 {
 	os << std::fixed << std::setprecision(2) << dt.currentDisp[POS_X] << "," << dt.currentDisp[POS_Y] << "," << dt.currentDisp[POS_Z]
 		<< "," << std::setprecision(5) << dt.currentDisp[ORI_X] << "," << dt.currentDisp[ORI_Y] << "," << dt.currentDisp[ORI_Z]
-		<< "," << dt.currentDisp[ORI_W] << "," << dt.handState << "|";
+		<< "," << dt.currentDisp[ORI_W] << "," << dt.handState << "|" << dt.currentDisp[ORI_WX] << "," << dt.currentDisp[ORI_WY] << ","
+		<< dt.currentDisp[ORI_WZ] << "," << dt.currentDisp[ORI_WW];
 	if (dt.changedInit)
 	{
-		os << "True";
+		os << "|True";
 	} 
     else
     {
-        os << "False";
+        os << "|False";
     }
 
 	return os;

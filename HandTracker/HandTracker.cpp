@@ -606,7 +606,8 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 									fprintf(stdout, "CONNSTATUS: %d\n", cs);
 									double quat1, quat2, quat3, quat4;
 									VMGloveGetQuaternionHand(m_gloveH, &quat1, &quat2, &quat3, &quat4);
-									fprintf(stdout, "%f", "%f", "%f", "%f");
+									double quat1W, quat2W, quat3W, quat4W;
+									VMGloveGetQuaternionWrist(m_gloveH, &quat1W, &quat2W, &quat3W, &quat4W);
 
 									int handState = -1;
 									int otherHandState = -1;
@@ -624,17 +625,17 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 									if (m_handPoseTracker == NULL)
 									{
 										m_handPoseTracker = new HandPose(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
-											quat1, quat2, quat3, quat4, handState);
+											quat1, quat2, quat3, quat4, quat1W, quat2W, quat3W, quat4W, handState);
 									}
 									else if (otherHandState == HandState_Lasso)
 									{
 										m_handPoseTracker->changeInitPose(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
-											quat1, quat2, quat3, quat4, handState);
+											quat1, quat2, quat3, quat4, quat1W, quat2W, quat3W, quat4W, handState);
 									}
 									else
 									{
 										m_handPoseTracker->update(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
-											quat1, quat2, quat3, quat4, handState);
+											quat1, quat2, quat3, quat4, quat1W, quat2W, quat3W, quat4W, handState);
 									}
 									/*float posX = joints[j].Position.X;
 									float posY = joints[j].Position.Y;

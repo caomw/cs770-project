@@ -13,6 +13,11 @@
 #define ORI_Y 4
 #define ORI_Z 5
 #define ORI_W 6
+#define ORI_WX 7 // wrist orientations...
+#define ORI_WY 8
+#define ORI_WZ 9
+#define ORI_WW 10
+
 
 class HandPose
 {
@@ -25,9 +30,9 @@ class HandPose
 	int handStateDebounceCount; // noise filter
 	bool changedInit;
 public:
-	HandPose(float _pX, float _pY, float _pZ, float _oX, float _oY, float _oZ, float _oW, int _hS);
+	HandPose(float _pX, float _pY, float _pZ, float _oX, float _oY, float _oZ, float _oW, float _oWX, float _oWY, float _oWZ, float _oWW, int _hS);
 	virtual ~HandPose();
-	void update(float _pX, float _pY, float _pZ, float _oX, float _oY, float _oZ, float _oW, int _hS);
-	void changeInitPose(float _pX, float _pY, float _pZ, float _oX, float _oY, float _oZ, float _oW, int _hS);
+	void update(float _pX, float _pY, float _pZ, float _oX, float _oY, float _oZ, float _oW, float _oWX, float _oWY, float _oWZ, float _oWW, int _hS);
+	void changeInitPose(float _pX, float _pY, float _pZ, float _oX, float _oY, float _oZ, float _oW, float _oWX, float _oWY, float _oWZ, float _oWW, int _hS);
 	friend std::ostream& operator<<(std::ostream& os, const HandPose& dt);
 };
