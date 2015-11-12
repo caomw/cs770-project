@@ -60,6 +60,7 @@ target/
 
 # linux tmp
 *.*~
+*~
 
 # ROS stuff
 [Ii]nstall/
