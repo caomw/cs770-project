@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 
 import SocketServer
-import roslib
 import rospy
-import thread
-import tf
-
-#from geometry_msgs.msg import Pose
+import copy
+from geometry_msgs.msg import Pose
 #from std_msgs.msg import Int8
 
 class HandDataListener(SocketServer.BaseRequestHandler):
@@ -18,19 +15,6 @@ class HandDataListener(SocketServer.BaseRequestHandler):
         Handle the data stream connection.
         :return: none
         """
-        global tf_broadcaster
-        global tf_listener
-        global KinectOriX
-        global KinectOriY
-        global KinectOriZ
-        global KinectOriW
-        global xOriRef
-        global yOriRef
-        global zOriRef
-        global wOriRef
-        global trans
-        global rot
-        
         self.data = self.request[0].strip()
         if self.data != "":
             rospy.loginfo("{} wrote: ".format(self.client_address[0]) + self.data)
@@ -40,40 +24,25 @@ class HandDataListener(SocketServer.BaseRequestHandler):
             handDisp = splitData[0].split(",")
             handRef = splitData[1]
 
+            # publish new hand pose
+            newPose = geometry_msgs.msg.Pose()
+            newPose.position.x = float(split_data[0])
+            newPose.position.y = float(split_data[1])
+            newPose.position.z = float(split_data[2])
+            newPose.orientation.x = float(split_data[3])
+            newPose.orientation.y = float(split_data[4])
+            newPose.orientation.z = float(split_data[5])
+            newPose.orientation.w = float(split_data[6])
+            hand_pose_pub.publish(newPose)
+            
             # update ref frame
-            if(handRef != "") or (trans == 0) or (rot == 0):
-                try:
-                    (trans,rot) = tf_listener.lookupTransform('/mico_api_origin','/mico_end_effector', rospy.Time())
-                except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                    return
-
-            #if(handRef != ""):
-                # update hand ref frame orientation
-            #    ref_data = handRef.split(",")
-            #    xOriRef = float(ref_data[0])
-            #    yOriRef = float(ref_data[1])
-            #    zOriRef = float(ref_data[2])
-            #    wOriRef = float(ref_data[3])
-
-            # update displacement
-            tf_broadcaster.sendTransform(trans,rot,rospy.Time.now(),"kinect_frame","mico_api_origin")
-            tf_broadcaster.sendTransform((0,0,0),(xOriRef,yOriRef,zOriRef,wOriRef),rospy.Time.now(),"hand_ref_frame","kinect_frame")
-            xPosDisp = float(handDisp[0])
-            yPosDisp = float(handDisp[1])
-            zPosDisp = float(handDisp[2])
-            xOriDisp = float(handDisp[3])
-            yOriDisp = float(handDisp[4])
-            zOriDisp = float(handDisp[5])
-            wOriDisp = float(handDisp[6])
-            handState = int(handDisp[7])
-
-            # calc tranform
-            #q_disp = [xOriDisp, yOriDisp, zOriDisp, wOriDisp]
-            #q_ref = [xOriRef, yOriRef, zOriRef, wOriRef]
-            #q_ref_inv = tf.transformations.quaternion_inverse(q_ref)
-            #q = tf.transformations.quaternion_multiply(q_ref_inv, q_disp)
-            #tf_broadcaster.sendTransform((xPosDisp, yPosDisp, zPosDisp),(q[0],q[1],q[2],q[3]),rospy.Time.now(),"hand_disp_frame","hand_ref_frame")
-            tf_broadcaster.sendTransform((-xPosDisp, yPosDisp, zPosDisp),(0,0,0,1),rospy.Time.now(),"hand_disp_frame","hand_ref_frame")
+            if(handRef == "True"):
+                refPose = copy.deepcopy(newPose)
+                refPose.position.x = 0.0
+                refPose.position.y = 0.0
+                refPose.position.z = 0.0
+                ref_pose_pub.publish(refPose)
+                
 
 if __name__ == '__main__':
     HOST, PORT = "192.168.1.100", 5050
@@ -85,30 +54,19 @@ if __name__ == '__main__':
     # function to stop listening (requires new thread)
     def ROSShutdown():
         rospy.loginfo("Attempting shutdown of SocketServer...")
-        
+        hand_pose_pub.unregister()
+        ref_pose_pub.unregister()
         def StopSocketListener(_s):
             _s.shutdown()
             
         thread.start_new_thread(StopSocketListener, (server,))
         rospy.loginfo("...Done!")
 
-    # start ROS node
+    # start ROS node and publishers
     rospy.init_node('HandDataListener', anonymous=True)
     rospy.on_shutdown(ROSShutdown)
-
-    # TF items
-    tf_broadcaster = tf.TransformBroadcaster()
-    tf_listener = tf.TransformListener()
-    trans = 0
-    rot = 0
-    KinectOriX = 0.0
-    KinectOriY = 0.0
-    KinectOriZ = 0.0
-    KinectOriW = 1.0
-    xOriRef = 0.0
-    yOriRef = 0.0
-    zOriRef = 0.0
-    wOriRef = 1.0
+    hand_pose_pub = rospy.Publisher('HandPose', Pose, queue_size=50)
+    ref_pose_pub = rospy.Publisher('HandRef', Pose, queue_size=50)
 
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C

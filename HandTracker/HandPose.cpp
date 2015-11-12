@@ -204,8 +204,12 @@ std::ostream& operator<<(std::ostream& os, const HandPose& dt)
 		<< "," << dt.currentDisp[ORI_W] << "," << dt.handState << "|";
 	if (dt.changedInit)
 	{
-		os << dt.poseInit[ORI_X] << "," << dt.poseInit[ORI_Y] << "," << dt.poseInit[ORI_Z] << "," << dt.poseInit[ORI_W];
-	}
+		os << "True";
+	} 
+    else
+    {
+        os << "False";
+    }
 
 	return os;
 }
