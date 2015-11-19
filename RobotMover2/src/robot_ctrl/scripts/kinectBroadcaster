@@ -10,7 +10,7 @@ def handle_change(msg):
     global rot
     if msg.data:
         try:
-            (trans,rot) = li.lookupTransform('/root','/mico_link_endeffector', rospy.Time())
+            (trans,r) = li.lookupTransform('/root','/mico_link_endeffector', rospy.Time())
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             return
         
@@ -19,7 +19,12 @@ if __name__ == '__main__':
     frameName = "kinect_frame"
     parentName = "root"
     trans = (0.0,0.0,0.0)
-    rot = (0.0,0.0,0.0,1.0)
+    #rot = (0,0,0,1)
+    e_z = 0.0
+    e_y = 90.0
+    e_x = 0.0
+    q = tf.transformations.quaternion_from_euler(e_x*0.017453293, e_y*0.017453293, e_z*0.017453293, 'szyx')
+    rot = (q[0],q[1],q[2],q[3])
     
     rospy.init_node('kinectBroadcaster', anonymous=True)
 
@@ -28,7 +33,7 @@ if __name__ == '__main__':
     waiting = True
     while waiting:
         try:
-            (trans,rot) = li.lookupTransform('/root','/mico_link_endeffector', rospy.Time())
+            (trans,r) = li.lookupTransform('/root','/mico_link_endeffector', rospy.Time())
             waiting = False
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             continue

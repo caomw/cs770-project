@@ -7,9 +7,6 @@ Panels:
         - /RobotModel1
         - /TF1
         - /TF1/Frames1
-        - /TF1/Frames1/mico_link_endeffector1
-        - /TF1/Frames1/mico_link_endeffector1/Position1
-        - /TF1/Frames1/mico_link_endeffector1/Orientation1
         - /TF1/Tree1
       Splitter Ratio: 0.628492
     Tree Height: 815
@@ -168,6 +165,10 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        hand_disp_frame:
+          Value: true
+        kinect_frame:
+          Value: true
         mico_large_ring_cover_1:
           Value: false
         mico_large_ring_cover_2:
@@ -187,7 +188,7 @@ Visualization Manager:
         mico_link_base:
           Value: false
         mico_link_endeffector:
-          Value: true
+          Value: false
         mico_link_finger_1:
           Value: false
         mico_link_finger_2:
@@ -205,7 +206,7 @@ Visualization Manager:
         mico_small_ring_cover_3:
           Value: false
         root:
-          Value: false
+          Value: true
       Marker Scale: 0.25
       Name: TF
       Show Arrows: true
@@ -213,6 +214,9 @@ Visualization Manager:
       Show Names: true
       Tree:
         root:
+          kinect_frame:
+            hand_disp_frame:
+              {}
           mico_link_base:
             mico_large_ring_cover_1:
               {}
@@ -266,16 +270,16 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.79313
+      Distance: 0.832737
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.0102924
-        Y: -0.0156868
-        Z: 0.073918
+        X: -0.076589
+        Y: -0.12054
+        Z: 0.192924
       Name: Current View
       Near Clip Distance: 0.01
       Pitch: 0.515203

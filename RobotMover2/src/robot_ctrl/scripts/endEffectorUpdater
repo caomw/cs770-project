@@ -1,0 +1,44 @@
+#!/usr/bin/env python  
+
+import roslib
+import rospy
+import tf
+from wpi_jaco_msgs.srv import QuaternionToEuler
+from wpi_jaco_msgs.msg import CartesianCommand
+from geometry_msgs.msg import Quaternion, Twist, Vector3
+
+if __name__ == '__main__':
+    frameName = "hand_disp_frame"
+    parentName = "/root"
+    
+    rospy.init_node('endEffectorUpdater', anonymous=True)
+    rospy.wait_for_service('/mico_conversions/quaternion_to_euler')
+    QtoE = rospy.ServiceProxy('/mico_conversions/quaternion_to_euler', QuaternionToEuler)
+    
+    pub = rospy.Publisher('/mico_arm/cartesian_cmd', CartesianCommand, queue_size=5)
+    li = tf.TransformListener()
+    rate = rospy.Rate(2.0)
+    while not rospy.is_shutdown():
+        try:
+            (trans,rot) = li.lookupTransform(parentName, frameName, rospy.Time())
+        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+            continue
+        
+        try:
+            eul = QtoE(Quaternion(rot[0],rot[1],rot[2],rot[3]))
+        except (rospy.ServiceException):
+            continue
+            
+        newPose = CartesianCommand()
+        newPose.position = True
+        newPose.armCommand = True
+        newPose.fingerCommand = False
+        newPose.repeat = False
+        
+        x = (trans[0] if (trans[0] >= 0.2) else 0.2) # limit front/back area
+        y = trans[1]
+        z = (trans[2] if (trans[2] >= 0.1) else 0.1) # limit up/down area
+        
+        newPose.arm = Twist(Vector3(x,y,z), Vector3(eul.roll,eul.pitch,eul.yaw))
+        pub.publish(newPose)
+        rate.sleep()

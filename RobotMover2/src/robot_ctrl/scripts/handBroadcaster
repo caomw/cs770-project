@@ -7,7 +7,7 @@ from geometry_msgs.msg import Pose
 
 def handle_pose(msg, (fName,pName)):
     br = tf.TransformBroadcaster()
-    br.sendTransform((-msg.position.x, msg.position.y, msg.position.z),
+    br.sendTransform((msg.position.x, msg.position.y, msg.position.z),
         (msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w),
         rospy.Time.now(),
         fName,

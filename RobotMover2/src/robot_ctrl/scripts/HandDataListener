@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import SocketServer
+import socket
 import rospy
 import thread
 import tf
@@ -26,6 +27,7 @@ class HandDataListener(SocketServer.BaseRequestHandler):
             handRef = splitData[1].split(",")
             refChange = splitData[2]
 
+            q_0 = [0.5, 0.5, 0.5, 0.5]
             qWrist = [float(handRef[0]), float(handRef[1]), float(handRef[2]), float(handRef[3])]
             qHand = [float(handDisp[3]), float(handDisp[4]), float(handDisp[5]), float(handDisp[6])]
             #q_ref_inv = tf.transformations.quaternion_inverse(q_ref)
@@ -62,7 +64,8 @@ class HandDataListener(SocketServer.BaseRequestHandler):
                 
 
 if __name__ == '__main__':
-    HOST, PORT = "192.168.1.101", 5050
+    HOST, PORT = "127.0.0.1", 5050
+    HOST = [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0]
 
     # Create the server, binding to localhost on port 5050
     rospy.loginfo("Starting SocketServer...")
@@ -88,5 +91,5 @@ if __name__ == '__main__':
 
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
-    rospy.loginfo("SocketServer listening for connections...")
+    rospy.loginfo("SocketServer listening for connections on " + str(HOST) + ":" + str(PORT) + "...")
     server.serve_forever()
