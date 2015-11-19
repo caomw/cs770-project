@@ -6,7 +6,7 @@ import rospy
 import thread
 import tf
 from geometry_msgs.msg import Pose
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, Int8
 
 class HandDataListener(SocketServer.BaseRequestHandler):
     """
@@ -17,6 +17,7 @@ class HandDataListener(SocketServer.BaseRequestHandler):
         Handle the data stream connection.
         :return: none
         """
+        global q_t
         self.data = self.request[0].strip()
         if self.data != "":
             rospy.loginfo("{} wrote: ".format(self.client_address[0]) + self.data)
@@ -27,11 +28,19 @@ class HandDataListener(SocketServer.BaseRequestHandler):
             handRef = splitData[1].split(",")
             refChange = splitData[2]
 
-            q_0 = [0.5, 0.5, 0.5, 0.5]
             qWrist = [float(handRef[0]), float(handRef[1]), float(handRef[2]), float(handRef[3])]
             qHand = [float(handDisp[3]), float(handDisp[4]), float(handDisp[5]), float(handDisp[6])]
             #q_ref_inv = tf.transformations.quaternion_inverse(q_ref)
-            q = tf.transformations.quaternion_multiply(qHand,qWrist)
+            
+            q_t_inv = tf.transformations.quaternion_inverse(q_t)
+            q_intermediate = tf.transformations.quaternion_multiply(qWrist,q_t_inv)
+            q_temp = tf.transformations.quaternion_multiply(q_t,q_intermediate)
+            
+            q_temp_inv = tf.transformations.quaternion_inverse(q_temp)
+            q_intermediate2 = tf.transformations.quaternion_multiply(qHand,q_temp_inv)
+            q_t = tf.transformations.quaternion_multiply(q_temp,q_intermediate2)
+            q = q_t
+            #q = tf.transformations.quaternion_multiply(qHand,qWrist)
 
             # publish new hand pose
             newPose = Pose()
@@ -60,12 +69,17 @@ class HandDataListener(SocketServer.BaseRequestHandler):
             if(refChange == "True"):
                 update = True
             ref_change_pub.publish(Bool(update))
+            
+            hand_state_pub.publish(Int8(int(handDisp[7])))
                 
                 
 
 if __name__ == '__main__':
     HOST, PORT = "127.0.0.1", 5050
     HOST = [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0]
+
+    # initial q_t
+    q_t = [0.5, 0.5, 0.5, 0.5]
 
     # Create the server, binding to localhost on port 5050
     rospy.loginfo("Starting SocketServer...")
@@ -88,6 +102,7 @@ if __name__ == '__main__':
     hand_pose_pub = rospy.Publisher('HandPose', Pose, queue_size=10)
     #ref_pose_pub = rospy.Publisher('RefPose', Pose, queue_size=10)
     ref_change_pub = rospy.Publisher('RefChange', Bool, queue_size=10)
+    hand_state_pub = rospy.Publisher('HandState', Int8, queue_size=10)
 
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
