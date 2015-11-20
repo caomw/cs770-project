@@ -2,60 +2,28 @@
 
 import actionlib
 import rospy
-from std_msgs.msg import Int8
-from control_msgs.msg import GripperCommandAction, GripperCommandGoal
-
-class MicoGripperControl:
-    def __init__(self):
-        name = 'mico_arm/fingers_controller/gripper'
-        self.client = actionlib.SimpleActionClient(name, GripperCommandAction)
-        server_up = self.client.wait_for_server(rospy.Duration(30.0))
-        if not server_up:
-            rospy.logerr("Server not online!")
-            rospy.signal_shutdown("Server not online!")
-            sys.exit(1)
-
-        self.goal = GripperCommandGoal()
-
-
-    def closeGrip(self):
-        #max is 6400
-        self.goal.command.position = 5250.0
-        self.goal.command.max_effort = 1.0
-        self.client.send_goal(self.goal)
-
-    def openGrip(self):
-        self.goal.command.position = 0.0
-        self.goal.command.max_effort = 1.0
-        self.client.send_goal(self.goal)
-
-    def wait(self):
-        timeout = rospy.Duration(7.0)
-        finish = self.client.wait_for_result(timeout)
-        result = (self.client.get_result().reached_goal == True)
-
-        #verify result
-        if all([finish, result]):
-            return True
-        else:
-            rospy.logwarn("gripper action timeout.")
-            return False
-
-    def stop(self):
-        if (self.client.gh is not None and self.client.get_state() == actionlib.GoalStatus.ACTIVE):
-            self.client.cancel_goal()
-        rospy.sleep(0.5)
+from std_msgs.msg import Int8, Float32
+from wpi_jaco_msgs.msg import CartesianCommand
+from geometry_msgs.msg import Quaternion, Twist, Vector3
 
 def handle_gripper(msg):
-    global
+    global gripper
     if msg.data == 2: #open
-        gripper.openGrip()
+        val = [Float32(0.0),Float32(0.0)]
     elif msg.data == 3: #close
-        gripper.closeGrip()
+        val = [Float32(5250.0),Float32(5250.0)]
+        
+    newGrip = CartesianCommand()
+    newGrip.position = True
+    newPose.armCommand = False
+    newPose.fingerCommand = True
+    newPose.repeat = True
+    newPose.fingers = val
+    pub.publish(newPose)
         
 if __name__ == '__main__':
     topicName = 'HandState'
     rospy.init_node('handStateCtrl', anonymous=True)
+    pub = rospy.Publisher('/mico_arm/cartesian_cmd', CartesianCommand, queue_size=5)
     rospy.Subscriber(topicName, Int8, handle_gripper, queue_size=10)
-    gripper = MicoGripperControl()
     rospy.spin()

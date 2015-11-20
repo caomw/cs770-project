@@ -17,10 +17,13 @@ class HandDataListener(SocketServer.BaseRequestHandler):
         Handle the data stream connection.
         :return: none
         """
-        global q_t
+        #global q_t
+        #global q_w_base_inv
+        #global q_h_base_inv
+        #global q_init
         self.data = self.request[0].strip()
         if self.data != "":
-            rospy.loginfo("{} wrote: ".format(self.client_address[0]) + self.data)
+            #rospy.loginfo("{} wrote: ".format(self.client_address[0]) + self.data)
 
             # split data
             splitData = self.data.split("|")
@@ -32,20 +35,26 @@ class HandDataListener(SocketServer.BaseRequestHandler):
             qHand = [float(handDisp[3]), float(handDisp[4]), float(handDisp[5]), float(handDisp[6])]
             #q_ref_inv = tf.transformations.quaternion_inverse(q_ref)
             
-            q_t_inv = tf.transformations.quaternion_inverse(q_t)
-            q_intermediate = tf.transformations.quaternion_multiply(qWrist,q_t_inv)
-            q_temp = tf.transformations.quaternion_multiply(q_t,q_intermediate)
+            #q_t_inv = tf.transformations.quaternion_inverse(q_t)
+            #q_w = tf.transformations.quaternion_multiply(qWrist,q_w_base_inv)
+            #q_intermediate = tf.transformations.quaternion_multiply(qWrist,q_t_inv)
+            #q_temp = tf.transformations.quaternion_multiply(q_t,q_intermediate)
             
-            q_temp_inv = tf.transformations.quaternion_inverse(q_temp)
-            q_intermediate2 = tf.transformations.quaternion_multiply(qHand,q_temp_inv)
-            q_t = tf.transformations.quaternion_multiply(q_temp,q_intermediate2)
-            q = q_t
+            #q_temp_inv = tf.transformations.quaternion_inverse(q_temp)
+            #q_h = tf.transformations.quaternion_multiply(qHand,q_h_base_inv)
+            #q_intermediate2 = tf.transformations.quaternion_multiply(qHand,q_temp_inv)
+            #q_t = tf.transformations.quaternion_multiply(q_temp,q_intermediate2)
+            #q = q_t
             #q = tf.transformations.quaternion_multiply(qHand,qWrist)
 
+            #q = tf.transformations.quaternion_multiply(qHand,qWrist)
+            q = qHand
+            #q = q_t
+            
             # publish new hand pose
             newPose = Pose()
             newPose.position.x = float(handDisp[0])
-            newPose.position.y = float(handDisp[1])
+            newPose.position.y = -float(handDisp[1])
             newPose.position.z = float(handDisp[2])
             newPose.orientation.x = q[0]
             newPose.orientation.y = q[1]
@@ -78,8 +87,11 @@ if __name__ == '__main__':
     HOST, PORT = "127.0.0.1", 5050
     HOST = [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0]
 
-    # initial q_t
-    q_t = [0.5, 0.5, 0.5, 0.5]
+    # initial q_t and base quaternions
+    #q_t = [0.5, 0.5, 0.5, 0.5]
+    #q_t = [0.0, 0.0, 0.0, 1.0]
+    #q_w_base_inv = tf.transformations.quaternion_inverse([0.73, -0.67, 0.07, 0.07])
+    #q_h_base_inv = tf.transformations.quaternion_inverse([0.73, -0.7, 0.18, -0.07])
 
     # Create the server, binding to localhost on port 5050
     rospy.loginfo("Starting SocketServer...")

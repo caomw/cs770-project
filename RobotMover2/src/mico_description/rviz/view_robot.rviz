@@ -165,10 +165,6 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        hand_disp_frame:
-          Value: true
-        kinect_frame:
-          Value: true
         mico_large_ring_cover_1:
           Value: false
         mico_large_ring_cover_2:
@@ -188,7 +184,7 @@ Visualization Manager:
         mico_link_base:
           Value: false
         mico_link_endeffector:
-          Value: false
+          Value: true
         mico_link_finger_1:
           Value: false
         mico_link_finger_2:
@@ -206,7 +202,7 @@ Visualization Manager:
         mico_small_ring_cover_3:
           Value: false
         root:
-          Value: true
+          Value: false
       Marker Scale: 0.25
       Name: TF
       Show Arrows: true
@@ -214,9 +210,6 @@ Visualization Manager:
       Show Names: true
       Tree:
         root:
-          kinect_frame:
-            hand_disp_frame:
-              {}
           mico_link_base:
             mico_large_ring_cover_1:
               {}
@@ -270,7 +263,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.832737
+      Distance: 1.2298
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
@@ -282,10 +275,10 @@ Visualization Manager:
         Z: 0.192924
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.515203
+      Pitch: 0.505203
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.0103901
+      Yaw: 6.08857
     Saved: ~
 Window Geometry:
   Displays:
