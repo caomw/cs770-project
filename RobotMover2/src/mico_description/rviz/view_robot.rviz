@@ -165,6 +165,8 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        kinect_frame:
+          Value: true
         mico_large_ring_cover_1:
           Value: false
         mico_large_ring_cover_2:
@@ -210,6 +212,8 @@ Visualization Manager:
       Show Names: true
       Tree:
         root:
+          kinect_frame:
+            {}
           mico_link_base:
             mico_large_ring_cover_1:
               {}

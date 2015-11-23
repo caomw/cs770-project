@@ -26,7 +26,8 @@ if __name__ == '__main__':
     #e_x = 0.0
     #q = tf.transformations.quaternion_from_euler(e_x*0.017453293, e_y*0.017453293, e_z*0.017453293, 'szyx')
     #rot = (q[0],q[1],q[2],q[3])
-    rot = (0.5, 0.5, 0.5, 0.5)
+    #rot = (0.5,0.5,0.5,0.5)
+    rot = (0.5, -0.5, 0.5, 0.5)
     
     rospy.init_node('kinectBroadcaster', anonymous=True)
 

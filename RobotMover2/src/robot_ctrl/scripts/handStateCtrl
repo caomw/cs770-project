@@ -7,21 +7,22 @@ from wpi_jaco_msgs.msg import CartesianCommand
 from geometry_msgs.msg import Quaternion, Twist, Vector3
 
 def handle_gripper(msg):
-    global gripper
+    global val
     if msg.data == 2: #open
-        val = [Float32(0.0),Float32(0.0)]
+        val = [0.0,0.0]
     elif msg.data == 3: #close
-        val = [Float32(5250.0),Float32(5250.0)]
+        val = [5250.0,5250.0]
         
     newGrip = CartesianCommand()
     newGrip.position = True
-    newPose.armCommand = False
-    newPose.fingerCommand = True
-    newPose.repeat = True
-    newPose.fingers = val
-    pub.publish(newPose)
+    newGrip.armCommand = False
+    newGrip.fingerCommand = True
+    newGrip.repeat = True
+    newGrip.fingers = val
+    pub.publish(newGrip)
         
 if __name__ == '__main__':
+    val = [0.0,0.0]
     topicName = 'HandState'
     rospy.init_node('handStateCtrl', anonymous=True)
     pub = rospy.Publisher('/mico_arm/cartesian_cmd', CartesianCommand, queue_size=5)

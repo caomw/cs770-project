@@ -54,7 +54,7 @@ class HandDataListener(SocketServer.BaseRequestHandler):
             # publish new hand pose
             newPose = Pose()
             newPose.position.x = float(handDisp[0])
-            newPose.position.y = -float(handDisp[1])
+            newPose.position.y = float(handDisp[1])
             newPose.position.z = float(handDisp[2])
             newPose.orientation.x = q[0]
             newPose.orientation.y = q[1]

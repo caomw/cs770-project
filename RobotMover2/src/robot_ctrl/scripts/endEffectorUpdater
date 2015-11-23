@@ -22,7 +22,7 @@ if __name__ == '__main__':
         try:
             (trans,rot) = li.lookupTransform(parentName, frameName, rospy.Time())
             #rot = [0.5, 0.5, 0.5, 0.5]
-            rot = tf.transformations.quaternion_inverse([rot[0],rot[1],rot[2],rot[3]])
+            #rot = tf.transformations.quaternion_inverse([rot[0],rot[1],rot[2],rot[3]])
             rospy.loginfo("Lookup trans: " + str(trans) + ", lookup rot: " + str(rot))
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             continue
@@ -42,7 +42,7 @@ if __name__ == '__main__':
         y = trans[1]
         z = (trans[2] if (trans[2] >= 0.1) else 0.1) # limit up/down area
         
-        newPose.arm = Twist(Vector3(x,y,z), Vector3(eul.roll+1.57079637051,eul.pitch,eul.yaw))
+        newPose.arm = Twist(Vector3(x,y,z), Vector3(eul.roll,eul.yaw,eul.pitch))
         rospy.loginfo("Sending msg: " + str(newPose))
         pub.publish(newPose)
         rate.sleep()
