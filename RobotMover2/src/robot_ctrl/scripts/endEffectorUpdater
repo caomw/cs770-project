@@ -3,27 +3,41 @@
 import roslib
 import rospy
 import tf
+from std_msgs.msg import Int8
 from wpi_jaco_msgs.srv import QuaternionToEuler
 from wpi_jaco_msgs.msg import CartesianCommand
 from geometry_msgs.msg import Quaternion, Twist, Vector3
 
+def handle_gripper(msg):
+    global val
+    global lastVal
+    if msg.data != lastVal:
+        if msg.data == 2: #open
+            val = [0.0,0.0]
+        elif msg.data == 3: #close
+            val = [5250.0,5250.0]
+    lastVal = msg.data
+    #rospy.loginfo("HAND STATE CALLBACK!!!!!!!!!!!!!!!!!!")
+    
+
 if __name__ == '__main__':
     frameName = "hand_disp_frame"
     parentName = "/root"
-    
+    val = [0.0, 0.0]
+    lastVal = 2
     rospy.init_node('endEffectorUpdater', anonymous=True)
     rospy.wait_for_service('/mico_conversions/quaternion_to_euler')
     QtoE = rospy.ServiceProxy('/mico_conversions/quaternion_to_euler', QuaternionToEuler)
-    
-    pub = rospy.Publisher('/mico_arm/cartesian_cmd', CartesianCommand, queue_size=5)
+    rospy.Subscriber('HandState', Int8, handle_gripper, queue_size=1)
+    pub = rospy.Publisher('/mico_arm/cartesian_cmd', CartesianCommand, queue_size=2)
     li = tf.TransformListener()
-    rate = rospy.Rate(5)
+    rate = rospy.Rate(10)
     while not rospy.is_shutdown():
         try:
             (trans,rot) = li.lookupTransform(parentName, frameName, rospy.Time())
             #rot = [0.5, 0.5, 0.5, 0.5]
             #rot = tf.transformations.quaternion_inverse([rot[0],rot[1],rot[2],rot[3]])
-            rospy.loginfo("Lookup trans: " + str(trans) + ", lookup rot: " + str(rot))
+            #rospy.loginfo("Lookup trans: " + str(trans) + ", lookup rot: " + str(rot))
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             continue
         
@@ -35,14 +49,15 @@ if __name__ == '__main__':
         newPose = CartesianCommand()
         newPose.position = True
         newPose.armCommand = True
-        newPose.fingerCommand = False
-        newPose.repeat = False
+        newPose.fingerCommand = True
+        newPose.fingers = val
+        newPose.repeat = True
         
         x = (trans[0] if (trans[0] >= 0.2) else 0.2) # limit front/back area
         y = trans[1]
         z = (trans[2] if (trans[2] >= 0.1) else 0.1) # limit up/down area
-        
-        newPose.arm = Twist(Vector3(x,y,z), Vector3(eul.roll,eul.yaw,eul.pitch))
-        rospy.loginfo("Sending msg: " + str(newPose))
+        newPose.arm = Twist(Vector3(x,y,z), Vector3(1.570796327,1.570796327,(-eul.yaw)))
+        #newPose.arm = Twist(Vector3(x,y,z), Vector3(eul.roll,eul.yaw,eul.pitch)) # this works
+        #rospy.loginfo("Sending msg: " + str(newPose))
         pub.publish(newPose)
         rate.sleep()

@@ -17,7 +17,7 @@ def handle_gripper(msg):
     newGrip.position = True
     newGrip.armCommand = False
     newGrip.fingerCommand = True
-    newGrip.repeat = True
+    newGrip.repeat = False
     newGrip.fingers = val
     pub.publish(newGrip)
         

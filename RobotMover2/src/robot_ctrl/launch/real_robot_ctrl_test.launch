@@ -40,6 +40,6 @@
   <node name="handBroadcaster" pkg="robot_ctrl" type="handBroadcaster" output="screen" />
   
   <!-- Launch Robot Movers -->
-  <node name="handStateCtrl" pkg="robot_ctrl" type="handStateCtrl" output="screen" />
-  <!-- <node name="endEffectorUpdater" pkg="robot_ctrl" type="endEffectorUpdater" output="screen" /> -->
+  <!-- <node name="handStateCtrl" pkg="robot_ctrl" type="handStateCtrl" output="screen" /> -->
+  <node name="endEffectorUpdater" pkg="robot_ctrl" type="endEffectorUpdater" output="screen" /> 
 </launch>

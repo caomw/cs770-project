@@ -165,46 +165,48 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        hand_disp_frame:
+          Value: true
         kinect_frame:
           Value: true
         mico_large_ring_cover_1:
-          Value: false
+          Value: true
         mico_large_ring_cover_2:
-          Value: false
+          Value: true
         mico_large_ring_cover_3:
-          Value: false
+          Value: true
         mico_link_1:
-          Value: false
+          Value: true
         mico_link_2:
-          Value: false
+          Value: true
         mico_link_3:
-          Value: false
+          Value: true
         mico_link_4:
-          Value: false
+          Value: true
         mico_link_5:
-          Value: false
+          Value: true
         mico_link_base:
-          Value: false
+          Value: true
         mico_link_endeffector:
           Value: true
         mico_link_finger_1:
-          Value: false
+          Value: true
         mico_link_finger_2:
-          Value: false
+          Value: true
         mico_link_finger_tip_1:
-          Value: false
+          Value: true
         mico_link_finger_tip_2:
-          Value: false
+          Value: true
         mico_link_hand:
-          Value: false
+          Value: true
         mico_small_ring_cover_1:
-          Value: false
+          Value: true
         mico_small_ring_cover_2:
-          Value: false
+          Value: true
         mico_small_ring_cover_3:
-          Value: false
+          Value: true
         root:
-          Value: false
+          Value: true
       Marker Scale: 0.25
       Name: TF
       Show Arrows: true
@@ -213,7 +215,8 @@ Visualization Manager:
       Tree:
         root:
           kinect_frame:
-            {}
+            hand_disp_frame:
+              {}
           mico_link_base:
             mico_large_ring_cover_1:
               {}
@@ -267,7 +270,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.2298
+      Distance: 2.16733
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
