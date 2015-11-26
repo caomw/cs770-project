@@ -597,8 +597,8 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 							{
 								jointPoints[j] = BodyToScreen(joints[j].Position, width, height);
 
-								if ((((controlHand == RIGHT) && (j == JointType_HandRight)) ||
-									((controlHand == LEFT) && (j == JointType_HandLeft))) && 
+								if ((((controlHand == RIGHT) && (j == JointType_WristRight)) ||
+									((controlHand == LEFT) && (j == JointType_WristLeft))) && 
 									(ConnectSocket != INVALID_SOCKET) )
 								{
 

@@ -4,8 +4,8 @@
 
 
 
-#define MOVING_AVERAGE_WINDOW 5
-#define POSE_VARIABLE_COUNT 7
+#define MOVING_AVERAGE_WINDOW 10
+#define POSE_VARIABLE_COUNT 11
 #define POS_X 0
 #define POS_Y 1
 #define POS_Z 2

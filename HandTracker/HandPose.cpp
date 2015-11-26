@@ -103,14 +103,26 @@ void HandPose::update(float _pX, float _pY, float _pZ, float _oX, float _oY, flo
 	currentDisp[ORI_Y] = poseInit[ORI_Y] - (MASum[ORI_Y] / MOVING_AVERAGE_WINDOW);
 	currentDisp[ORI_Z] = poseInit[ORI_Z] - (MASum[ORI_Z] / MOVING_AVERAGE_WINDOW);
 	currentDisp[ORI_W] = poseInit[ORI_W] - (MASum[ORI_W] / MOVING_AVERAGE_WINDOW);*/
-	currentDisp[ORI_X] = (MASum[ORI_X] / MOVING_AVERAGE_WINDOW);
-	currentDisp[ORI_Y] = (MASum[ORI_Y] / MOVING_AVERAGE_WINDOW);
-	currentDisp[ORI_Z] = (MASum[ORI_Z] / MOVING_AVERAGE_WINDOW);
-	currentDisp[ORI_W] = (MASum[ORI_W] / MOVING_AVERAGE_WINDOW);
-	currentDisp[ORI_WX] = (MASum[ORI_WX] / MOVING_AVERAGE_WINDOW);
-	currentDisp[ORI_WY] = (MASum[ORI_WY] / MOVING_AVERAGE_WINDOW);
-	currentDisp[ORI_WZ] = (MASum[ORI_WZ] / MOVING_AVERAGE_WINDOW);
-	currentDisp[ORI_WW] = (MASum[ORI_WW] / MOVING_AVERAGE_WINDOW);
+
+	// currentDisp[ORI_X] = (MASum[ORI_X] / MOVING_AVERAGE_WINDOW);
+	// currentDisp[ORI_Y] = (MASum[ORI_Y] / MOVING_AVERAGE_WINDOW);
+	// currentDisp[ORI_Z] = (MASum[ORI_Z] / MOVING_AVERAGE_WINDOW);
+	// currentDisp[ORI_W] = (MASum[ORI_W] / MOVING_AVERAGE_WINDOW);
+	// currentDisp[ORI_WX] = (MASum[ORI_WX] / MOVING_AVERAGE_WINDOW);
+	// currentDisp[ORI_WY] = (MASum[ORI_WY] / MOVING_AVERAGE_WINDOW);
+	// currentDisp[ORI_WZ] = (MASum[ORI_WZ] / MOVING_AVERAGE_WINDOW);
+	// currentDisp[ORI_WW] = (MASum[ORI_WW] / MOVING_AVERAGE_WINDOW);
+
+	//use raw data for orientation quaternions:
+
+	currentDisp[ORI_X] = _oX;
+	currentDisp[ORI_Y] = _oY;
+	currentDisp[ORI_Z] = _oZ;
+	currentDisp[ORI_W] = _oW;
+	currentDisp[ORI_WX] = _oWX;
+	currentDisp[ORI_WY] = _oWY;
+	currentDisp[ORI_WZ] = _oWZ;
+	currentDisp[ORI_WW] = _oWW;
 
 	// update moving average queues
 	MAQueue[POS_X].pop();
@@ -228,14 +240,28 @@ void HandPose::changeInitPose(float _pX, float _pY, float _pZ, float _oX, float 
 	currentDisp[ORI_Y] = 0.0;
 	currentDisp[ORI_Z] = 0.0;
 	currentDisp[ORI_W] = 0.0;*/
-	currentDisp[ORI_X] = (MASum[ORI_X] / MOVING_AVERAGE_WINDOW);
-	currentDisp[ORI_Y] = (MASum[ORI_Y] / MOVING_AVERAGE_WINDOW);
-	currentDisp[ORI_Z] = (MASum[ORI_Z] / MOVING_AVERAGE_WINDOW);
-	currentDisp[ORI_W] = (MASum[ORI_W] / MOVING_AVERAGE_WINDOW);
-	currentDisp[ORI_WX] = (MASum[ORI_WX] / MOVING_AVERAGE_WINDOW);
-	currentDisp[ORI_WY] = (MASum[ORI_WY] / MOVING_AVERAGE_WINDOW);
-	currentDisp[ORI_WZ] = (MASum[ORI_WZ] / MOVING_AVERAGE_WINDOW);
-	currentDisp[ORI_WW] = (MASum[ORI_WW] / MOVING_AVERAGE_WINDOW);
+
+	//currentDisp[ORI_X] = (MASum[ORI_X] / MOVING_AVERAGE_WINDOW);
+	//currentDisp[ORI_Y] = (MASum[ORI_Y] / MOVING_AVERAGE_WINDOW);
+	//currentDisp[ORI_Z] = (MASum[ORI_Z] / MOVING_AVERAGE_WINDOW);
+	//currentDisp[ORI_W] = (MASum[ORI_W] / MOVING_AVERAGE_WINDOW);
+	//currentDisp[ORI_WX] = (MASum[ORI_WX] / MOVING_AVERAGE_WINDOW);
+	//currentDisp[ORI_WY] = (MASum[ORI_WY] / MOVING_AVERAGE_WINDOW);
+	//currentDisp[ORI_WZ] = (MASum[ORI_WZ] / MOVING_AVERAGE_WINDOW);
+	//currentDisp[ORI_WW] = (MASum[ORI_WW] / MOVING_AVERAGE_WINDOW);
+
+	//just use raw data for glove quaternions:
+	currentDisp[ORI_X] = _oX;
+	currentDisp[ORI_Y] = _oY;
+	currentDisp[ORI_Z] = _oZ;
+	currentDisp[ORI_W] = _oW;
+
+	currentDisp[ORI_WX] = _oWX;
+	currentDisp[ORI_WY] = _oWY;
+	currentDisp[ORI_WZ] = _oWZ;
+	currentDisp[ORI_WW] = _oWW;
+
+
 
 	// inialize hand state
 
