@@ -79,7 +79,8 @@ class HandDataListener(SocketServer.BaseRequestHandler):
                 update = True
             ref_change_pub.publish(Bool(update))
             
-            hand_state_pub.publish(Int8(int(handDisp[7])))
+            if (int(handDisp[7]) == 2) or (int(handDisp[7]) == 3):
+                hand_state_pub.publish(Int8(int(handDisp[7])))
                 
                 
 
@@ -111,10 +112,10 @@ if __name__ == '__main__':
     # start ROS node and publishers
     rospy.init_node('HandDataListener', anonymous=True)
     rospy.on_shutdown(ROSShutdown)
-    hand_pose_pub = rospy.Publisher('HandPose', Pose, queue_size=10)
+    hand_pose_pub = rospy.Publisher('HandPose', Pose, queue_size=2)
     #ref_pose_pub = rospy.Publisher('RefPose', Pose, queue_size=10)
-    ref_change_pub = rospy.Publisher('RefChange', Bool, queue_size=10)
-    hand_state_pub = rospy.Publisher('HandState', Int8, queue_size=10)
+    ref_change_pub = rospy.Publisher('RefChange', Bool, queue_size=2)
+    hand_state_pub = rospy.Publisher('HandState', Int8, queue_size=2)
 
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
