@@ -613,12 +613,14 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 									int otherHandState = -1;
 									if (controlHand == RIGHT)
 									{
-										handState = (int)rightHandState;
+										//handState = (int)rightHandState;
+										handState = (int)leftHandState;
 										otherHandState = (int)leftHandState;
 									}
 									else if (controlHand == LEFT)
 									{
-										handState = (int)leftHandState;
+										//handState = (int)leftHandState;
+										handState = (int)rightHandState;
 										otherHandState = (int)rightHandState;
 									}
 
@@ -627,11 +629,11 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 										m_handPoseTracker = new HandPose(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
 											quat1, quat2, quat3, quat4, quat1W, quat2W, quat3W, quat4W, handState);
 									}
-									else if (otherHandState == HandState_Lasso)
+									/*else if (otherHandState == HandState_Lasso)
 									{
 										m_handPoseTracker->changeInitPose(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
 											quat1, quat2, quat3, quat4, quat1W, quat2W, quat3W, quat4W, handState);
-									}
+									}*/
 									else
 									{
 										m_handPoseTracker->update(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
