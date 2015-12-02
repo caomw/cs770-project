@@ -629,42 +629,18 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 										m_handPoseTracker = new HandPose(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
 											quat1, quat2, quat3, quat4, quat1W, quat2W, quat3W, quat4W, handState);
 									}
-									/*else if (otherHandState == HandState_Lasso)
-									{
-										m_handPoseTracker->changeInitPose(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
-											quat1, quat2, quat3, quat4, quat1W, quat2W, quat3W, quat4W, handState);
-									}*/
 									else
 									{
 										m_handPoseTracker->update(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
 											quat1, quat2, quat3, quat4, quat1W, quat2W, quat3W, quat4W, handState);
 									}
-									/*float posX = joints[j].Position.X;
-									float posY = joints[j].Position.Y;
-									float posZ = joints[j].Position.Z;
-									float oriX = joint_orient[j].Orientation.x;
-									float oriY = joint_orient[j].Orientation.y;
-									float oriZ = joint_orient[j].Orientation.z;
-									float oriW = joint_orient[j].Orientation.w;*/
-
-									// overwrite m_handPoseTracker orientation using glove data here...
-
-									
-									////////////////////////////
-								
 
 									// CONVERT TO STRING AND SEND VIA SOCKET
 									std::stringstream ss;
-									//ss << posX << "," << posY << "," << posZ << "," << oriX << "," << oriY << "," << oriZ << "," << oriW << "," << handState;
 									ss << *m_handPoseTracker;
 									std::string& tmp = ss.str();
 
 									const char *msg = tmp.c_str();
-									//char sendbuf[DEFAULT_BUFLEN];
-									//memset(sendbuf, ' ', DEFAULT_BUFLEN);
-									//memcpy(sendbuf, msg, strlen(msg));
-									//int iResult = send(ConnectSocket, sendbuf, DEFAULT_BUFLEN, 0);
-									//std::cout << tmp << std::endl;
 									int iResult = sendto(ConnectSocket, msg, (int)strlen(msg), 0, ptr->ai_addr, ptr_length);
 									if (iResult == SOCKET_ERROR) {
 										MessageBox(m_hWnd, L"Send data failed!", NULL, MB_OK | MB_ICONERROR);

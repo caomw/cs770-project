@@ -5,6 +5,7 @@
 
 
 #define MOVING_AVERAGE_WINDOW 5
+#define POSITION_VARIABLE_COUNT 3
 #define POSE_VARIABLE_COUNT 11
 #define POS_X 0
 #define POS_Y 1
@@ -22,12 +23,14 @@
 class HandPose
 {
 	double poseInit[POSE_VARIABLE_COUNT]; // initial position
-	double MASum[POSE_VARIABLE_COUNT]; // moving average sums
-	std::queue<double> MAQueue[POSE_VARIABLE_COUNT];
 	double currentDisp[POSE_VARIABLE_COUNT]; // current position displacement
+
+	double MASum[POSITION_VARIABLE_COUNT]; // moving average sums for position
+	std::queue<double> MAQueue[POSITION_VARIABLE_COUNT];
+
 	int handState; // current hand state
-	int lastHandState;
-	int handStateDebounceCount; // noise filter
+	//int lastHandState;
+	//int handStateDebounceCount; // noise filter
 	bool changedInit;
 public:
 	HandPose(float _pX, float _pY, float _pZ, float _oX, float _oY, float _oZ, float _oW, float _oWX, float _oWY, float _oWZ, float _oWW, int _hS);
