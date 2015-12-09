@@ -1,0 +1,40 @@
+﻿Open( "C:\Users\cbodden\Documents\GitHub\cs770-project\Data\Subjective.jmp" );
+Multivariate(
+	Y(
+		:made_task_easy,
+		:easy_to_understand,
+		:fun,
+		:would_use_again,
+		:confident,
+		:accurate,
+		:satisfied,
+		:useful,
+		:happy
+	),
+	Estimation Method( "Row-wise" ),
+	Scatterplot Matrix(
+		Density Ellipses( 1 ),
+		Shaded Ellipses( 0 ),
+		Ellipse Color( 3 )
+	),
+	Principal Components(
+		on Correlations,
+		Scree Plot,
+		Factor Rotation( ML, SMC, 3, Varimax )
+	),
+	SendToReport(
+		Dispatch(
+			{"Principal Components / Factor Analysis", "Scree Plot"},
+			"Scree Plot",
+			FrameBox,
+			{Frame Size( 438, 171 )}
+		),
+		Dispatch(
+			{"Principal Components / Factor Analysis",
+			"Factor Analysis: Maximum Likelihood / Varimax", "Factor Loading Plot"},
+			"Loading Plot for Rotated Factor",
+			FrameBox,
+			{Frame Size( 56, 39 )}
+		)
+	)
+);

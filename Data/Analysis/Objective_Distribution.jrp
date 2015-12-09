@@ -1,0 +1,22 @@
+﻿Open( "C:\Users\cbodden\Documents\GitHub\cs770-project\Data\Objective.jmp" );
+Distribution(
+	Stack( 1 ),
+	Continuous Distribution(
+		Column( :Score ),
+		Horizontal Layout( 1 ),
+		Vertical( 0 ),
+		Fit Distribution( Normal( Goodness of Fit( 1 ) ) )
+	),
+	Continuous Distribution(
+		Column( :Errors ),
+		Horizontal Layout( 1 ),
+		Vertical( 0 ),
+		Fit Distribution( Normal( Goodness of Fit( 1 ) ) )
+	),
+	Continuous Distribution(
+		Column( :Name( "Task Time (seconds)" ) ),
+		Horizontal Layout( 1 ),
+		Vertical( 0 ),
+		Fit Distribution( Normal( Goodness of Fit( 1 ) ) )
+	)
+);

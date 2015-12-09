@@ -1,0 +1,38 @@
+﻿Open( "C:\Users\cbodden\Documents\GitHub\cs770-project\Data\Subjective.jmp" );
+Fit Model(
+	Y( :Ease of Use ),
+	Effects( :Control Type, :Task Type, :Control Type * :Task Type ),
+	Random Effects(
+		:Participant[:Control Type],
+		:Participant * :Task Type[:Control Type]
+	),
+	Personality( Standard Least Squares ),
+	Method( REML ),
+	Emphasis( Minimal Report ),
+	Run(
+		:Ease of Use << {Analysis of Variance( 0 ), Parameter Estimates( 0 ),
+		Lack of Fit( 0 ), Plot Actual by Predicted( 0 ), Plot Regression( 0 ),
+		Plot Residual by Predicted( 0 ), Plot Effect Leverage( 0 ), AICc( 1 ),
+		Show All Confidence Intervals( 1 ), {:Control Type << {LSMeans Plot( 1 ),
+		LSMeans Tukey HSD( 0.05, Ordered Differences Report( 1 ) )}, :Task Type <<
+		{LSMeans Plot( 1 ), LSMeans Student's t(
+			0.05,
+			Ordered Differences Report( 1 )
+		)}, :Control Type * :Task Type << {LSMeans Plot( 1 ),
+		LSMeans Tukey HSD( 0.05 )}}}
+	),
+	SendToReport(
+		Dispatch(
+			{"Response Ease of Use"},
+			"REML Variance Component Estimates",
+			OutlineBox,
+			{Close( 1 )}
+		),
+		Dispatch(
+			{"Response Ease of Use"},
+			"Effect Details",
+			OutlineBox,
+			{Close( 0 )}
+		)
+	)
+);

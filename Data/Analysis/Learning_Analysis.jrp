@@ -1,0 +1,24 @@
+﻿Open( "C:\Users\cbodden\Documents\GitHub\cs770-project\Data\Learning.jmp" );
+Fit Model(
+	Y( :Name( "Learning Time (seconds)" ) ),
+	Effects( :Control Type ),
+	Random Effects( :Participant ),
+	Personality( Standard Least Squares ),
+	Method( REML ),
+	Emphasis( Effect Leverage ),
+	Run(
+		:Name( "Learning Time (seconds)" ) << {Analysis of Variance( 0 ),
+		Lack of Fit( 0 ), Plot Actual by Predicted( 1 ), Plot Regression( 0 ),
+		Plot Residual by Predicted( 1 ), Plot Effect Leverage( 1 ), {:Control Type
+		 << {LSMeans Plot( 1 ), LSMeans Student's t( 0.05 ),
+		LSMeans Tukey HSD( 0.05 )}}}
+	),
+	SendToReport(
+		Dispatch(
+			{"Response Learning Time (seconds)", "Control Type", "LS Means Plot"},
+			"FitLS LSM Plot",
+			FrameBox,
+			{Frame Size( 526, 399 )}
+		)
+	)
+);

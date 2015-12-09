@@ -1,0 +1,14 @@
+﻿Open( "C:\Users\cbodden\Documents\GitHub\cs770-project\Data\Objective.jmp" );
+Graph Builder(
+	Variables( X( :Control Type ), Y( :Score ), Color( :Control Type ) ),
+	Elements(
+		Bar(
+			X,
+			Y,
+			Legend( 2 ),
+			Bar Style( "Side by side" ),
+			Summary Statistic( "Mean" ),
+			Error Bars( "Standard Error" )
+		)
+	)
+);

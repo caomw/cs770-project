@@ -1,0 +1,21 @@
+﻿Open( "C:\Users\cbodden\Documents\GitHub\cs770-project\Data\Subjective.jmp" );
+Graph Builder(
+	Variables(
+		X( :Control Type ),
+		Y( :Ease of Use ),
+		Y( :Usefulness, Position( 1 ) ),
+		Y( :Enjoyment, Position( 1 ) )
+	),
+	Elements(
+		Bar(
+			X,
+			Y( 1 ),
+			Y( 2 ),
+			Y( 3 ),
+			Legend( 4 ),
+			Bar Style( "Side by side" ),
+			Summary Statistic( "Mean" ),
+			Error Bars( "Standard Error" )
+		)
+	)
+);

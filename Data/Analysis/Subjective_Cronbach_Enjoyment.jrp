@@ -1,0 +1,11 @@
+﻿Open( "C:\Users\cbodden\Documents\GitHub\cs770-project\Data\Subjective.jmp" );
+Multivariate(
+	Y( :fun, :satisfied, :happy ),
+	Estimation Method( "Row-wise" ),
+	Scatterplot Matrix(
+		Density Ellipses( 1 ),
+		Shaded Ellipses( 0 ),
+		Ellipse Color( 3 )
+	),
+	Cronbach's α( 1 )
+);

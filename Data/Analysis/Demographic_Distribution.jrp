@@ -1,0 +1,22 @@
+﻿Open( "C:\Users\cbodden\Documents\GitHub\cs770-project\Data\Demographic.jmp" );
+Distribution(
+	Stack( 1 ),
+	Continuous Distribution(
+		Column( :Age ),
+		Horizontal Layout( 1 ),
+		Vertical( 0 ),
+		Fit Distribution( Normal )
+	),
+	Nominal Distribution( Column( :Gender ), Horizontal Layout( 1 ), Vertical( 0 ) ),
+	Continuous Distribution(
+		Column( :Robot Familiarity ),
+		Horizontal Layout( 1 ),
+		Vertical( 0 ),
+		Fit Distribution( Normal )
+	),
+	Nominal Distribution(
+		Column( :Prior Robot Research ),
+		Horizontal Layout( 1 ),
+		Vertical( 0 )
+	)
+);

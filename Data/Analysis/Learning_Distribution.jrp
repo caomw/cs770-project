@@ -1,0 +1,10 @@
+﻿Open( "C:\Users\cbodden\Documents\GitHub\cs770-project\Data\Learning.jmp" );
+Distribution(
+	Stack( 1 ),
+	Continuous Distribution(
+		Column( :Name( "Learning Time (seconds)" ) ),
+		Horizontal Layout( 1 ),
+		Vertical( 0 ),
+		Fit Distribution( Normal( Goodness of Fit( 1 ) ) )
+	)
+);
