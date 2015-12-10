@@ -5,14 +5,14 @@ Distribution(
 		Column( :Age ),
 		Horizontal Layout( 1 ),
 		Vertical( 0 ),
-		Fit Distribution( Normal )
+		Fit Distribution( Normal( Goodness of Fit( 1 ) ) )
 	),
 	Nominal Distribution( Column( :Gender ), Horizontal Layout( 1 ), Vertical( 0 ) ),
 	Continuous Distribution(
 		Column( :Robot Familiarity ),
 		Horizontal Layout( 1 ),
 		Vertical( 0 ),
-		Fit Distribution( Normal )
+		Fit Distribution( Normal( Goodness of Fit( 1 ) ) )
 	),
 	Nominal Distribution(
 		Column( :Prior Robot Research ),

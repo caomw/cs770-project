@@ -1,0 +1,12 @@
+﻿Open( "C:\Users\cbodden\Documents\GitHub\cs770-project\Data\Subjective.jmp" );
+Multivariate(
+	Y( :Ease of Use, :Usefulness, :Enjoyment ),
+	Estimation Method( "Row-wise" ),
+	Scatterplot Matrix(
+		Density Ellipses( 1 ),
+		Shaded Ellipses( 0 ),
+		Ellipse Color( 3 )
+	),
+	Color Map On Correlations( 1 ),
+	Pairwise Correlations( 1 )
+);
