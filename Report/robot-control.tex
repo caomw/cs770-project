@@ -114,7 +114,21 @@ In constructing our qualitative scales for post-hoc questionnaires, we used two 
 
 \section{Experimental Study}
 
-\textbf{[set up study, what components we used, the task types, the experimental design, stats about the participant]}
+Our study involved different control methods of a Kinova Mico arm, while looking at differnet types of tasks that either easily or did not easily map to natural human movement.  In order to enable capture of participants arm motion to manipulate the robot arm, we use the Kinect to capture the position of the participants right hand in three-dimensional space, as well as a VML data glove, providing clearer hand orientation.  The participant has the ability to use their off-hand to change the gripper state on the robot arm---a closed fist and an open palm close and open the gripper, respectively.  Input was captured on a machine, and hand position, orientation, and gripper state are passed via UDP packets at 4Hz to a receiving machine running the ROS application that can direct the Mico robot arm. Figure~\ref{fig:demo} shows an example setup of an experimental trial. 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\columnwidth]{../Data/Figures/kinesiological_demo_2.jpg}
+	\caption{The context of our model experiment.  The Kinect is on the tripod with a clear view of the participant and his right arm, while a data glove captures hand orientation.  The participant is motioning with his off-hand for the robot to open its gripper. \label{fig:demo}}
+\end{figure} 
+
+Our research question concerns the effect of kinesiological robot arm control on novice user task performance and perception for tasks that do and do not have kinesiological mappings to human motion.  Based on our two tasks, we derived three input modalities, two of which are based on our kinesiological capture system.  One modality captures the hand position and orientation, while the other augments this with direct control of non-natural robot actuation (e.g. rotating the robot wrist more than a full rotation).  We call this second modality ``kines+'' in our work. The third input control is the packaged joystick with the Mico robot.  The joystick has several modes---the primary moves the end effector in three-dimensional space through a bidirectional pad and adds the third dimension via twists of the control knob.  The other modes modify elbow orientation and wrist orientation and gripping.  
+
+We hypothesize that kinesiological control of the robot arm for natural mappings of tasks will perform better than the two other modes of control, and likewise hypothesize that direct control of the robot with the joystick will help users accomplish tasks that do not have direct mappings. Furthermore, we hypothesize that the combined control method (kines+) will perform as well or better than kinesiological control for tasks with natural mappings, and better than joystick control for tasks without natural mappings.
+
+The experimental design is a $3\times2$ factorial design with the three input modalities: joystick, kinesiological control, and kinesiological augmented with direct input (kines+); and two task types: direct mapping to natural movement, and robot-augmented movement.  We implemented our study as a mixed-methods design to minimize learning effects of manipulating the robot. Control modality was beteween-participants and task type was within-participants. Each participant was randomly assigned a control modality and asked to complete two tasks (in counterbalanced order).  We collected participants ($n=12$) from within a university setting between the ages of 19--40 ($\mu = 27.1, \rho = 5.5$; 2 females, 10 males).
+
+% \textbf{[set up study, what components we used, the task types, the experimental design, stats about the participant]}
 
 \subsection{Procedure}
 
@@ -178,11 +192,6 @@ We thank Professor Bilge Multu and Michael Gleicher for discussions in designing
 % Or, just remove \balance and give up on balancing the last page.
 %
 \balance
-
-\section{References format}
-References must be the same font size as other body text.
-% REFERENCES FORMAT
-% References must be the same font size as other body text.
 
 \bibliographystyle{acm-sigchi}
 \bibliography{robot-control}
