@@ -101,6 +101,12 @@ Manipulation of external robot interfaces can be a challenging tasks, and moreso
 
 In the implementation of our work, we have developed a system that uses computer vision to track an individual's arm in three-dimensional space and map that input to the end effector of a Kinova Mico robot arm.  Our kinesological implementation allows for real-time manipulation and control of the robot arm in real-time, and in conjunction with gyroscope readings from a smart glove worn by the individual, allows a user to move, rotate, and actuate fingers of the hand without direct manipulation of a joystick. In our experimentation, we also allow users to use the Kinova-included joystick to accomplish similar tasks. Through our study, we show how tasks that do not map one-to-one with natural movement can have limitations that need non-kinesological (e.g. direct) control to overcome.  However, we also show that depending on the task type, the control type had a strong effect on user perception.
 
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=\columnwidth]{../Data/Figures/kinesiological_demo_2.jpg}
+	\caption{The context of our model experiment.  The Kinect is on the tripod with a clear view of the participant and his right arm, while a data glove captures hand orientation.  The participant is motioning with his off-hand for the robot to open its gripper.}
+	 \label{fig:demo}
+\end{figure} 
 
 \section{Background}
 
@@ -115,12 +121,6 @@ In constructing our qualitative scales for post-hoc questionnaires, we used two 
 \section{Experimental Study}
 
 Our study involved different control methods of a Kinova Mico arm, while looking at differnet types of tasks that either easily or did not easily map to natural human movement.  In order to enable capture of participants arm motion to manipulate the robot arm, we use the Kinect to capture the position of the participants right hand in three-dimensional space, as well as a VML data glove, providing clearer hand orientation.  The participant has the ability to use their off-hand to change the gripper state on the robot arm---a closed fist and an open palm close and open the gripper, respectively.  Input was captured on a machine, and hand position, orientation, and gripper state are passed via UDP packets at 4Hz to a receiving machine running the ROS application that can direct the Mico robot arm. Figure~\ref{fig:demo} shows an example setup of an experimental trial. 
-
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=0.9\columnwidth]{../Data/Figures/kinesiological_demo_2.jpg}
-	\caption{The context of our model experiment.  The Kinect is on the tripod with a clear view of the participant and his right arm, while a data glove captures hand orientation.  The participant is motioning with his off-hand for the robot to open its gripper. \label{fig:demo}}
-\end{figure} 
 
 Our research question concerns the effect of kinesiological robot arm control on novice user task performance and perception for tasks that do and do not have kinesiological mappings to human motion.  Based on our two tasks, we derived three input modalities, two of which are based on our kinesiological capture system.  One modality captures the hand position and orientation, while the other augments this with direct control of non-natural robot actuation (e.g. rotating the robot wrist more than a full rotation).  We call this second modality ``kines+'' in our work. The third input control is the packaged joystick with the Mico robot.  The joystick has several modes---the primary moves the end effector in three-dimensional space through a bidirectional pad and adds the third dimension via twists of the control knob.  The other modes modify elbow orientation or wrist orientation and hand gripping.  
 
@@ -138,12 +138,22 @@ To assess the performance and perception of these different control types, we us
 
 % \textbf{[what measures we did, how we split up the participants, the procedure that each participant saw]}
 
-\subsection{Results and Discussion}
+\subsection{Results}
+
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=\columnwidth]{figures/bar_charts.pdf}
+	\caption{Results objective (top-left) and subjective measures. Kinesiological control impairs user performance and perceived ease of use for the rotation (no 1-to-1 mapping) task. However, there is no difference between joystick and kinesiological+ control. \em{Error bars represent standard error.} $\ast: p \leq 0.01, \dagger:p \leq 0.05 $ }
+	\label{fig:bar_chart}
+\end{figure} 
+
 \subsubsection{Task type}
 
-
-
 \subsubsection{User perception}
+
+\subsection{Discussion}
+
+
 
 
 
