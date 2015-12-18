@@ -22,6 +22,7 @@
 \usepackage{graphics} % for EPS, load graphicx instead
 \usepackage{times}    % comment if you want LaTeX's default font
 \usepackage{url}      % llt: nicely formatted URLs
+\usepackage{array}
 
 % llt: Define a global style for URLs, rather that the default one
 \makeatletter
@@ -110,7 +111,7 @@ In the implementation of our work, we have developed a system that uses computer
 
 \section{Background}
 
-Advances in the areas of computer vision and robot control have enabled us to able to rapidly prototype and se these techniques to allow for novice control of a robot arm.  In particular, we utilized the Kinect for Windows SDK~\cite{Kinect} to quickly capture an individuals arm with a Microsoft Kinect.  By piping hand locations over the network to a machine running the ROS (Robot Operating System) system~\cite{ROS} interfaced to the Kinova robot arm, we are able to directly control the robot using kinesological control.
+Advances in the areas of computer vision and robot control have enabled us to able to rapidly prototype and se these techniques to allow for novice control of a robot arm.  In particular, we utilized the Kinect for Windows SDK~\cite{Kinect} to quickly capture an individuals arm with a Microsoft Kinect.  By piping hand locations over the network to a machine running the ROS (Robot Operating System) system~\cite{ROS} interfaced to the Kinova robot arm, we are able to directly control the robot using kinesiological control.
 
 Several prior studies have looked at how remote control of robots can assist in manufacturing and human-robot collaboration tasks. Our work context follows a long line of research in bilateral teleoperation (see Hokayem and Spong for a wide-spanning survey~\cite{hokayem2006bilateral}), which concerns issues of stability and telepresence.  Critically, the two-way feedback mechanisms between the human operator and the robotic analog needs to be such to minimize perceptible latency in the connection, and also provide enough feedback to judge and adapt input.  Park \emph{et al.} represents some early work in teleoperation to help smooth error in input to the output trajectory in the robot.  The authors use differing stiffnesses of objects that the robot interacts with to vary how the robot communicates with the controller, and represents an advancement in bilateral teleoperation.
 
@@ -120,30 +121,68 @@ In constructing our qualitative scales for post-hoc questionnaires, we used two 
 
 \section{Experimental Study}
 
-Our study involved different control methods of a Kinova Mico arm, while looking at differnet types of tasks that either easily or did not easily map to natural human movement.  In order to enable capture of participants arm motion to manipulate the robot arm, we use the Kinect to capture the position of the participants right hand in three-dimensional space, as well as a VML data glove, providing clearer hand orientation.  The participant has the ability to use their off-hand to change the gripper state on the robot arm---a closed fist and an open palm close and open the gripper, respectively.  Input was captured on a machine, and hand position, orientation, and gripper state are passed via UDP packets at 4Hz to a receiving machine running the ROS application that can direct the Mico robot arm. Figure~\ref{fig:demo} shows an example setup of an experimental trial. 
+Our study involved different control methods of a Kinova Mico arm, while looking at different types of tasks that either easily or did not easily map to natural human movement.  In order to enable capture of participants arm motion to manipulate the robot arm, we use the Kinect to capture the position of the participants right hand in three-dimensional space, as well as a VML data glove, providing clearer hand orientation.  The participant has the ability to use their off-hand to change the gripper state on the robot arm---a closed fist and an open palm close and open the gripper, respectively.  Input was captured on a machine, and hand position, orientation, and gripper state are passed via UDP packets at 4Hz to a receiving machine running the ROS application that can direct the Mico robot arm. Figure~\ref{fig:demo} shows an example setup of an experimental trial. 
 
 Our research question concerns the effect of kinesiological robot arm control on novice user task performance and perception for tasks that do and do not have kinesiological mappings to human motion.  Based on our two tasks, we derived three input modalities, two of which are based on our kinesiological capture system.  One modality captures the hand position and orientation, while the other augments this with direct control of non-natural robot actuation (e.g. rotating the robot wrist more than a full rotation).  We call this second modality ``kines+'' in our work. The third input control is the packaged joystick with the Mico robot.  The joystick has several modes---the primary moves the end effector in three-dimensional space through a bidirectional pad and adds the third dimension via twists of the control knob.  The other modes modify elbow orientation or wrist orientation and hand gripping.  
 
-We hypothesize that kinesiological control of the robot arm for natural mappings of tasks will perform better than the two other modes of control, and likewise hypothesize that direct control of the robot with the joystick will help users accomplish tasks that do not have direct mappings. Furthermore, we hypothesize that the combined control method (kines+) will perform as well or better than kinesiological control for tasks with natural mappings, and better than joystick control for tasks without natural mappings.
+\subsection{Study Design}
 
-The experimental design is a $3\times2$ factorial design with the three input modalities: joystick, kinesiological control, and kinesiological augmented with direct input (kines+); and two task types: direct mapping to natural movement, and robot-augmented movement.  We implemented our study as a mixed-methods design to minimize learning effects of manipulating the robot. Control modality was beteween-participants and task type was within-participants. Each participant was randomly assigned a control modality and asked to complete two tasks (in counterbalanced order).  We collected participants ($n=12$) from within a university setting between the ages of 19--40 ($\mu = 27.1, \rho = 5.5$; 2 females, 10 males).
+We designed a $3\times2$ mixed-methods design with the three input modalities: joystick, kinesiological control, and kinesiological augmented with direct input (kines+); and two task types: direct mapping to natural movement, and robot-augmented movement.  We implemented our study as a mixed-methods design to minimize learning effects of manipulating the robot. Control modality was between-participants and task type was within-participants. Each participant was randomly assigned a control modality and asked to complete two tasks (in counterbalanced order).
+
+\subsection{Hypotheses}
+
+\textbf{H1:} We hypothesize that kinesiological control of the robot arm for natural mappings of tasks will perform better than the two other modes of control, and likewise hypothesize that direct control of the robot with the joystick will help users accomplish tasks that do not have direct mappings. Furthermore, we hypothesize that the combined control method (kines+) will perform as well or better than kinesiological control for tasks with natural mappings, and as well or better than joystick control for tasks without natural mappings.
+
+\textbf{H2:} We hypothesize that the same relationships as \textbf{H1} will hold for our participant perceptions, (ease-of-use, usefulness, and enjoyment) of the control method as well. We believe this because kinesiological control should feel more natural and easier to control for tasks with direct mappings, while the additional range of motion provided by the joystick should be perceived better on tasks with no direct mapping. Kines+ provides the best of this two conditions, so we believe it will perform as well or better than the other conditions.
 
 % \textbf{[set up study, what components we used, the task types, the experimental design, stats about the participant]}
 
-\subsection{Procedure}
+\subsection{Participants \& Procedure}
 
-Participants were randomly assigned their input modality randomly.  Each participant was given an instruction sheet with how to manipulate the robot and given an unbounded amount of time to manipulate and practice with the assigned input method.  Once a confirmation was given by the participant to proceed, they were given an instruction sheet for the task.  After reading and confirming that no clarification questions were needed, a timer was started and stopped when the desired action was completed, with an upper-bound of five minutes.  The one-to-one mapping task requested the participant to move a cup from one location on a table to another location (we call this the ``movement'' task), while the non one-to-one mapping required a 360 rotation of the cup in-place (requiring lifting of the cup; ``rotation'' task).  Upon completion, the remaining task type was administered in the same fashion.  After the completion of the two tasks, demographic and robot familiarity information was collected.
+We recruited participants ($n=12$) from within a university setting between the ages of 19--40 ($\mu = 27.1, \rho = 5.5$; 2 females, 10 males). Participants received a candy bar as compensation for completing the tasks. The total study time per a participants was 10 minutes.
 
-To assess the performance and perception of these different control types, we use task completion time as an analog for task completion performance.  To measure perception of different control types for each task type, we administered a questionnaire along the dimensions of Davis~\cite{Davis1989} after each unique combinations of factors, measuring participant perception of the manipulation method with the task type along dimensions of usefulness, ease-of-use, and acceptance.  Each participant completed each task for their randomly assigned input modality once. 
+Participants were randomly assigned their input modality randomly.  Each participant was given an instruction sheet with how to manipulate the robot and given an unbounded amount of time to manipulate and practice with the assigned input method.  Once a confirmation was given by the participant to proceed, they were given an instruction sheet for the task.  After reading and confirming that no clarification questions were needed, a timer was started and stopped when the desired action was completed, with an upper-bound of five minutes.  The one-to-one mapping task requested the participant to move a cup from one location on a table to another location (we call this the ``movement'' task), while the non one-to-one mapping required a 360 rotation of the cup in-place (requiring lifting of the cup; ``rotation'' task).  Upon completion, the remaining task type was administered in the same fashion.  After the completion of the two tasks, demographic and robot familiarity information was collected. Each participant completed each task for their randomly assigned input modality once. 
+
+\subsection{Measures}
+
+ \begin{table}[t]
+\centering
+\caption{Subjective Questions}
+\begin{tabular}{|p{\columnwidth}|}
+\hline
+\em{Ease of Use} ($\alpha = 0.81$) \\
+1) The control method made it easy to accomplish the task. \\
+2) I felt confident controlling the robot. \\
+3) I could accurately control the robot. \\
+\hline
+\em{Usefulness} ($\alpha = 0.74$) \\
+1) Controlling the robot was easy to understand. \\
+2) I would like to control a robot like this in the future. \\
+3) I found the control method useful. \\
+\hline
+\em{Enjoyment} ($\alpha = 0.85$) \\
+1) Controlling the robot was fun. \\
+2) I felt satisfied while controlling the robot. \\
+3) I felt happy while controlling the robot. \\
+\hline
+\end{tabular}
+\label{tab:subjective}
+ \end{table}
+
+To evaluate participants' performance we measured one objective metric, \textit{score}. Score was calculated by normalizing the time taken to complete each task by the maximum time allotment of five minutes.
+
+To measure participants' perception of different control types for each task type, we administered a questionnaire, inspired by scales proposed by Davis and Lin~\cite{Davis1989, Lin2008}, after each unique combinations of factors measuring participant perception of the manipulation method with the task type along dimensions of usefulness, ease-of-use, and enjoyment. Three questions per a measure were asked along each of the subjective dimensions, which are shown in Table \ref{tab:subjective}, using a seven-point rating scale from strongly disagree (1) to strongly agree (7). Cronbach's $\alpha\geq0.7$ for each dimension, which confirms the reliability of each scale. Factor analysis was also performed. Three factor are above the Kaiser criterion, and within these factors the loadings for each question are grouped as described in the table.
 
 % \textbf{[what measures we did, how we split up the participants, the procedure that each participant saw]}
 
 \subsection{Results}
 
+Participants data was analyzed for each measure using full-factorial analysis of variance (ANOVA). For each measure control type was modeled as between participants and task type was modeled as within participants. Our analysis also includes equivalence analysis. To test equivalence we conclude that $p\geq0.25$ means two populations are equal. Our hypotheses area concerning interaction effects between control type and task type; however, main effects from independent variables are also reported here. Results are shown in Figure \ref{fig:bar_chart}.
+
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=\columnwidth]{figures/bar_charts.pdf}
-	\caption{Results objective (top-left) and subjective measures. Kinesiological control impairs user performance and perceived ease of use for the rotation (no 1-to-1 mapping) task. However, there is no difference between joystick and kinesiological+ control. \em{Error bars represent standard error.} $\ast: p \leq 0.01, \dagger:p \leq 0.05 $ }
+	\caption{Results objective (top-left) and subjective measures. Kinesiological control impairs user performance and perceived ease of use for the rotation (no 1-to-1 mapping) task. However, there is no difference between joystick and kines+ control. \em{Error bars represent standard error.} $\ast: p \leq 0.01, \dagger:p \leq 0.05 $ }
 	\label{fig:bar_chart}
 \end{figure} 
 
@@ -153,9 +192,11 @@ To assess the performance and perception of these different control types, we us
 
 \subsection{Discussion}
 
+Our results were able to provide some support for \textbf{H1}. Performance for kines+ is similar to kinesiological control for direct mapping tasks and similar to joystick control for tasks with no direct mapping. Joystick control outperforms kinesiological control for tasks with no direct mapping. However, contrary to \textbf{H1}, kinesiological control was not significantly better performing versus joystick control for direct mapping tasks.
 
+Our results provide limited support for \textbf{H2} as perceptions of kines+ is similar to kinesiological control for direct mapping tasks and similar to joystick control for tasks with no direct mapping. However, the hypothesized perception difference between joystick and kinesiological was only apparent for ease of use in the no direct mapping task.
 
-
+We hypothesize several factors could contribute to the lack of significant results. First our sample size is small ($n=12$). Second, we believe for many novice robot users, the novelty of controlling the robot is perceived well even when performance is impaired.
 
 \section{Future Work \& Conclusion}
 
