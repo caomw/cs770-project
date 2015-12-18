@@ -14,7 +14,6 @@
 # *.ps
 # *.eps
 # *.pdf
-Report/robot-control.pdf
 
 ## Bibliography auxiliary files (bibtex/biblatex/biber):
 *.bbl
