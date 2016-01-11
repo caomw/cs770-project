@@ -17,10 +17,6 @@ class HandDataListener(SocketServer.BaseRequestHandler):
         Handle the data stream connection.
         :return: none
         """
-        #global q_t
-        #global q_w_base_inv
-        #global q_h_base_inv
-        #global q_init
         self.data = self.request[0].strip()
         if self.data != "":
             #rospy.loginfo("{} wrote: ".format(self.client_address[0]) + self.data)
@@ -33,23 +29,9 @@ class HandDataListener(SocketServer.BaseRequestHandler):
 
             qWrist = [float(handRef[0]), float(handRef[1]), float(handRef[2]), float(handRef[3])]
             qHand = [float(handDisp[3]), float(handDisp[4]), float(handDisp[5]), float(handDisp[6])]
-            #q_ref_inv = tf.transformations.quaternion_inverse(q_ref)
-            
-            #q_t_inv = tf.transformations.quaternion_inverse(q_t)
-            #q_w = tf.transformations.quaternion_multiply(qWrist,q_w_base_inv)
-            #q_intermediate = tf.transformations.quaternion_multiply(qWrist,q_t_inv)
-            #q_temp = tf.transformations.quaternion_multiply(q_t,q_intermediate)
-            
-            #q_temp_inv = tf.transformations.quaternion_inverse(q_temp)
-            #q_h = tf.transformations.quaternion_multiply(qHand,q_h_base_inv)
-            #q_intermediate2 = tf.transformations.quaternion_multiply(qHand,q_temp_inv)
-            #q_t = tf.transformations.quaternion_multiply(q_temp,q_intermediate2)
-            #q = q_t
-            #q = tf.transformations.quaternion_multiply(qHand,qWrist)
 
-            #q = tf.transformations.quaternion_multiply(qHand,qWrist)
             q = qHand
-            #q = q_t
+            #q = qWrist
             
             # publish new hand pose
             newPose = Pose()
@@ -61,17 +43,6 @@ class HandDataListener(SocketServer.BaseRequestHandler):
             newPose.orientation.z = q[2]
             newPose.orientation.w = q[3]
             hand_pose_pub.publish(newPose)
-            
-            # publish new ref pose
-            #newRefPose = Pose()
-            #newRefPose.position.x = 0.0
-            #newRefPose.position.y = 0.0
-            #newRefPose.position.z = 0.0
-            #newRefPose.orientation.x = 
-            #newRefPose.orientation.y = float(handRef[1])
-            #newRefPose.orientation.z = float(handRef[2])
-            #newRefPose.orientation.w = float(handRef[3])
-            #ref_pose_pub.publish(newRefPose)
             
             # change ref frame?
             update = False
@@ -88,12 +59,6 @@ if __name__ == '__main__':
     HOST, PORT = "127.0.0.1", 5050
     HOST = [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0]
 
-    # initial q_t and base quaternions
-    #q_t = [0.5, 0.5, 0.5, 0.5]
-    #q_t = [0.0, 0.0, 0.0, 1.0]
-    #q_w_base_inv = tf.transformations.quaternion_inverse([0.73, -0.67, 0.07, 0.07])
-    #q_h_base_inv = tf.transformations.quaternion_inverse([0.73, -0.7, 0.18, -0.07])
-
     # Create the server, binding to localhost on port 5050
     rospy.loginfo("Starting SocketServer...")
     server = SocketServer.UDPServer((HOST, PORT), HandDataListener)
@@ -101,8 +66,6 @@ if __name__ == '__main__':
     # function to stop listening (requires new thread)
     def ROSShutdown():
         rospy.loginfo("Attempting shutdown of SocketServer...")
-        #hand_pose_pub.unregister()
-        #ref_pose_pub.unregister()
         def StopSocketListener(_s):
             _s.shutdown()
             
@@ -113,9 +76,8 @@ if __name__ == '__main__':
     rospy.init_node('HandDataListener', anonymous=True)
     rospy.on_shutdown(ROSShutdown)
     hand_pose_pub = rospy.Publisher('HandPose', Pose, queue_size=2)
-    #ref_pose_pub = rospy.Publisher('RefPose', Pose, queue_size=10)
     ref_change_pub = rospy.Publisher('RefChange', Bool, queue_size=2)
-    hand_state_pub = rospy.Publisher('HandState', Int8, queue_size=2)
+    hand_state_pub = rospy.Publisher('HandState', Int8, queue_size=5)
 
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
