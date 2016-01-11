@@ -586,6 +586,7 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
                         HandState leftHandState = HandState_Unknown;
                         HandState rightHandState = HandState_Unknown;
 
+						//get hand state
                         pBody->get_HandLeftState(&leftHandState);
                         pBody->get_HandRightState(&rightHandState);
 
@@ -608,6 +609,51 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 									VMGloveGetQuaternionHand(m_gloveH, &quat1, &quat2, &quat3, &quat4);
 									double quat1W, quat2W, quat3W, quat4W;
 									VMGloveGetQuaternionWrist(m_gloveH, &quat1W, &quat2W, &quat3W, &quat4W);
+
+
+									//finger rotation data
+									//100 is max value, corresponds to 0 rotation
+									double fingers[10];
+									VMGloveGetFingers(m_gloveH, fingers);
+									double close_thumbLower_threshold =  95.0;
+									double close_indexUpper_threshold =  99.0;
+									double close_indexLower_threshold =  95.0;
+									double close_middleUpper_threshold = 99.0;
+									double close_middleLower_threshold = 95.0;
+
+									double open_thumbLower_threshold =  30.0;
+									double open_indexUpper_threshold =  80.0;
+									double open_indexLower_threshold =  46.0;
+									double open_middleUpper_threshold = 80.0;
+									double open_middleLower_threshold = 80.0;
+
+									if (
+										fingers[1] < close_thumbLower_threshold &&
+										fingers[2] < close_indexUpper_threshold &&
+										fingers[3] < close_indexLower_threshold &&
+										fingers[4] < close_middleUpper_threshold &&
+										fingers[5] < close_middleLower_threshold  
+										) {
+
+										leftHandState =  HandState_Closed;
+										rightHandState = HandState_Closed;
+
+									}
+									else if (
+										fingers[1] > open_thumbLower_threshold &&
+										fingers[2] > open_indexUpper_threshold &&
+										fingers[3] > open_indexLower_threshold &&
+										fingers[4] > open_middleUpper_threshold &&
+										fingers[5] > open_middleLower_threshold 
+										) {
+										leftHandState =  HandState_Open;
+										rightHandState = HandState_Open;
+									}
+									else {
+										leftHandState =  HandState_NotTracked;
+										rightHandState = HandState_NotTracked;
+									}
+
 
 									int handState = -1;
 									int otherHandState = -1;
