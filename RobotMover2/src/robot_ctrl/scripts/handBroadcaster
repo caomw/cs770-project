@@ -7,23 +7,11 @@ from geometry_msgs.msg import Pose
 from wpi_jaco_msgs.srv import QuaternionToEuler
 
 def handle_pose(msg, (fName,pName)):
-    #global q_t
-    #global q_base
-    #global q_base_inv
-    
     q = [msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w]
-    #if q_base == 0:
-    #    q_base = q_new
-    
-    #q_temp = tf.transformations.quaternion_multiply(q_new, tf.transformations.quaternion_inverse(q_base))
-    #q = tf.transformations.quaternion_multiply(q_t, q_temp)
-    #q = tf.transformations.quaternion_multiply(q_new, tf.transformations.quaternion_inverse(q_base))
-    #q = tf.transformations.quaternion_multiply(q_t, q)
-
-    #q = [0, 0, 0, 1.0] # this works
-    scaleFactor = 0.55
+    #q = [0,0,0,1] #glove +
+    scaleFactor = 0.5
     br = tf.TransformBroadcaster()
-    br.sendTransform((-scaleFactor*msg.position.y, -scaleFactor*msg.position.z, -scaleFactor*msg.position.x),
+    br.sendTransform((scaleFactor*msg.position.x, -scaleFactor*msg.position.y, scaleFactor*msg.position.z),
         (q[0], q[1], q[2], q[3]),
         rospy.Time.now(),
         fName,
@@ -33,15 +21,6 @@ if __name__ == '__main__':
     topicName = 'HandPose'
     frameName = "hand_disp_frame"
     parentName = "kinect_frame"
-    #q_w_base = [0.73, -0.67, 0.07, 0.07]
-    #q_h_base = [0.73, -0.7, 0.18, -0.07]
-    #q_t = [0.0, 0.0, 0.0, 1.0]
-    #q_t = [0.707107, 0.0, 0.0, 0.707107]
-    #q_base = tf.transformations.quaternion_multiply(q_h_base,q_w_base)
-    #q_base = q_h_base
-    #q_base_inv = tf.transformations.quaternion_inverse(q_base)
-    #q_h_base_inv = tf.transformations.quaternion_inverse(q_h_base)
-    q_base = 0
     
     rospy.init_node('handBroadcaster', anonymous=True)
     rospy.Subscriber(topicName,Pose,handle_pose,(frameName,parentName), queue_size=10)

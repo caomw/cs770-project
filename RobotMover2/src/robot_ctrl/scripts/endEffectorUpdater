@@ -10,13 +10,10 @@ from geometry_msgs.msg import Quaternion, Twist, Vector3
 
 def handle_gripper(msg):
     global val
-    global lastVal
-    if msg.data != lastVal:
-        if msg.data == 2: #open
-            val = [0.0,0.0]
-        elif msg.data == 3: #close
-            val = [5250.0,5250.0]
-    lastVal = msg.data
+    if msg.data == 2: #open
+        val = [0.0,0.0]
+    elif msg.data == 3: #close
+        val = [5000.0,5000.0]
     #rospy.loginfo("HAND STATE CALLBACK!!!!!!!!!!!!!!!!!!")
     
 
@@ -24,19 +21,16 @@ if __name__ == '__main__':
     frameName = "hand_disp_frame"
     parentName = "/root"
     val = [0.0, 0.0]
-    lastVal = 2
     rospy.init_node('endEffectorUpdater', anonymous=True)
     rospy.wait_for_service('/mico_conversions/quaternion_to_euler')
     QtoE = rospy.ServiceProxy('/mico_conversions/quaternion_to_euler', QuaternionToEuler)
-    rospy.Subscriber('HandState', Int8, handle_gripper, queue_size=1)
-    pub = rospy.Publisher('/mico_arm/cartesian_cmd', CartesianCommand, queue_size=2)
+    rospy.Subscriber('HandState', Int8, handle_gripper, queue_size=5)
+    pub = rospy.Publisher('/mico_arm/cartesian_cmd', CartesianCommand, queue_size=5)
     li = tf.TransformListener()
-    rate = rospy.Rate(10)
+    rate = rospy.Rate(5)
     while not rospy.is_shutdown():
         try:
             (trans,rot) = li.lookupTransform(parentName, frameName, rospy.Time())
-            #rot = [0.5, 0.5, 0.5, 0.5]
-            #rot = tf.transformations.quaternion_inverse([rot[0],rot[1],rot[2],rot[3]])
             #rospy.loginfo("Lookup trans: " + str(trans) + ", lookup rot: " + str(rot))
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             continue
@@ -51,13 +45,31 @@ if __name__ == '__main__':
         newPose.armCommand = True
         newPose.fingerCommand = True
         newPose.fingers = val
-        newPose.repeat = True
+        newPose.repeat = False
         
-        x = (trans[0] if (trans[0] >= 0.2) else 0.2) # limit front/back area
-        y = trans[1]
-        z = (trans[2] if (trans[2] >= 0.1) else 0.1) # limit up/down area
-        newPose.arm = Twist(Vector3(x,y,z), Vector3(1.570796327,1.570796327,(-eul.yaw)))
-        #newPose.arm = Twist(Vector3(x,y,z), Vector3(eul.roll,eul.yaw,eul.pitch)) # this works
+        x = (trans[0] if (trans[0] <= 0.4) else 0.4) # limit
+        x = (x if (x >= -0.4) else -0.4)# limit
+        y = (trans[1] if (trans[1] <= -0.2) else -0.2)
+        z = (trans[2] if (trans[2] >= 0.05) else 0.05) # limit up/down area
+       
+        #rospy.loginfo("Lookup yaw: " + str(eul.yaw))
+        wrist = eul.yaw
+        if ((wrist < 3.926990817) and (wrist > 2.35619449)) or ((wrist > -3.926990817) and (wrist < -2.35619449)):
+            wrist = -3.14
+        elif ((wrist > 3.926990817) and (wrist < 5.497787144)) or ((wrist < -0.75398163) and (wrist > -2.35619449)):
+            wrist = -1.57
+        elif ((wrist < -3.926990817) and (wrist > -5.497787144)) or ((wrist > 0.75398163) and (wrist < 2.35619449)):
+            wrist = -1.57
+        else:
+            wrist = 0.0
+        
+        
+        #elif wrist > 0:
+        #    wrist = wrist - 6.283185307
+            
+        #rospy.loginfo("wrist: " + str(-wrist))
+        #newPose.arm = Twist(Vector3(x,y,z), Vector3(1.570796327,1.570796327,(eul.yaw)))
+        newPose.arm = Twist(Vector3(x,y,z), Vector3(1.570796327,0.0,-wrist))
         #rospy.loginfo("Sending msg: " + str(newPose))
         pub.publish(newPose)
         rate.sleep()
