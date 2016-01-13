@@ -113,6 +113,9 @@ private:
     // Direct2D
     ID2D1Factory*           m_pD2DFactory;
 
+	// frame counter
+	INT64                   m_FrameCounter;
+
     // Body/hand drawing
     ID2D1HwndRenderTarget*  m_pRenderTarget;
     ID2D1SolidColorBrush*   m_pBrushJointTracked;

@@ -92,6 +92,8 @@ HandTracker::HandTracker() :
 
 	std::cout << "hello" << std::endl;
 
+	m_FrameCounter = 0;
+
 	VMGloveConnect(m_gloveH, CONN_USB, PKG_QUAT_FINGER);
 
     LARGE_INTEGER qpf = {0};
@@ -597,10 +599,11 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 							for (int j = 0; j < _countof(joints); ++j)
 							{
 								jointPoints[j] = BodyToScreen(joints[j].Position, width, height);
+								short publishRate = 5;
 
 								if ((((controlHand == RIGHT) && (j == JointType_WristRight)) ||
 									((controlHand == LEFT) && (j == JointType_WristLeft))) && 
-									(ConnectSocket != INVALID_SOCKET) )
+									(ConnectSocket != INVALID_SOCKET) && (m_FrameCounter % publishRate == 0))
 								{
 
 									int cs = VMGloveGetConnectionStatus(m_gloveH);
@@ -751,6 +754,8 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
             m_nFramesSinceUpdate = 0;
         }
     }
+
+	m_FrameCounter++;
 }
 
 /// <summary>
