@@ -5,23 +5,59 @@ import rospy
 import tf
 from geometry_msgs.msg import Pose
 from wpi_jaco_msgs.srv import QuaternionToEuler
+import math
+
+global lastX
+global lastY
+global lastZ
 
 def handle_pose(msg, (fName,pName)):
     q = [msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w]
     #q = [0,0,0,1] #glove +
-    scaleFactor = 0.5
+
+    currX = msg.position.x
+    currY = msg.position.y
+    currZ = msg.position.z
+
+    dX = currX - lastX
+    dY = currY - lastY
+    dZ = currZ - lastZ
+
+    # derivative of magnitude
+    dMag = math.sqrt(dX*dX + dY*dY + dZ*dZ)
+    scaleFactor = 1.0
+
     br = tf.TransformBroadcaster()
-    br.sendTransform((scaleFactor*msg.position.x, -scaleFactor*msg.position.y, scaleFactor*msg.position.z),
+    # br.sendTransform((scaleFactor*msg.position.x, -scaleFactor*msg.position.y, scaleFactor*msg.position.z),
+    #    (q[0], q[1], q[2], q[3]),
+    #    rospy.Time.now(),
+    #    fName,
+    #    pName)
+
+    br.sendTransform((scaleFactor*dMag*msg.position.x, -scaleFactor*dMag*msg.position.y, scaleFactor*dMag*msg.position.z),
         (q[0], q[1], q[2], q[3]),
         rospy.Time.now(),
         fName,
         pName)
+
+    global lastX, lastY, lastZ
+    lastX = msg.position.x
+    lastY = msg.position.y
+    lastZ = msg.position.z
         
 if __name__ == '__main__':
     topicName = 'HandPose'
     frameName = "hand_disp_frame"
     parentName = "kinect_frame"
-    
+
+    # init globals
+    global lastX
+    lastX = 0
+    global lastY
+    lastY = 0
+    global lastZ
+    lastZ = 0
+
     rospy.init_node('handBroadcaster', anonymous=True)
     rospy.Subscriber(topicName,Pose,handle_pose,(frameName,parentName), queue_size=10)
     rospy.spin()
