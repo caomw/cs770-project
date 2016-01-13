@@ -3,7 +3,6 @@
 #include <queue>
 
 
-
 #define MOVING_AVERAGE_WINDOW 5
 #define POSITION_VARIABLE_COUNT 3
 #define POSE_VARIABLE_COUNT 11

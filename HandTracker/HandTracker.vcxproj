@@ -29,6 +29,7 @@
     <ResourceCompile Include="HandTracker.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Filter.h" />
     <ClInclude Include="HandPose.h" />
     <ClInclude Include="HandTracker.h" />
     <ClInclude Include="resource.h" />

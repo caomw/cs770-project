@@ -14,6 +14,7 @@
 #include <string>
 #include <stdio.h>
 #include <windows.h>
+#include <vector>
 
 // additional macros
 //
@@ -115,6 +116,12 @@ private:
 
 	// frame counter
 	INT64                   m_FrameCounter;
+
+	short                   m_FilterWindowSize;
+	// windows for filtering
+	float*      m_X_Window;
+	float*      m_Y_Window;
+	float*      m_Z_Window;
 
     // Body/hand drawing
     ID2D1HwndRenderTarget*  m_pRenderTarget;
