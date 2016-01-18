@@ -93,14 +93,14 @@ HandTracker::HandTracker() :
 
 	std::cout << "hello" << std::endl;
 
-	m_FrameCounter = 1; // initialize on 1 so loop isn't entered on first one
-	m_FilterWindowSize = 5;
-	m_X_Window = new float[m_FilterWindowSize];
-	m_Y_Window = new float[m_FilterWindowSize];
-	m_Z_Window = new float[m_FilterWindowSize];
-	m_X_Window[0] = 15.0;
+	m_FrameCounter = 0; // initialize on 1 so loop isn't entered on first one
+	m_FilterWindowSize = 1;
+	//m_X_Window = new float[m_FilterWindowSize];
+	//m_Y_Window = new float[m_FilterWindowSize];
+	//m_Z_Window = new float[m_FilterWindowSize];
+	//m_X_Window[0] = 15.0;
 
-	std::cout << m_X_Window[0] << std::endl;
+	//std::cout << m_X_Window[0] << std::endl;
 
 	VMGloveConnect(m_gloveH, CONN_USB, PKG_QUAT_FINGER);
 
@@ -607,18 +607,19 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 							for (int j = 0; j < _countof(joints); ++j)
 							{
 								jointPoints[j] = BodyToScreen(joints[j].Position, width, height);
-								m_X_Window[m_FrameCounter % m_FilterWindowSize] = joints[j].Position.X;
-								m_Y_Window[m_FrameCounter % m_FilterWindowSize] = joints[j].Position.Y;
-								m_Z_Window[m_FrameCounter % m_FilterWindowSize] = joints[j].Position.Z;
+								//m_X_Window[m_FrameCounter % m_FilterWindowSize] = joints[j].Position.X;
+								//m_Y_Window[m_FrameCounter % m_FilterWindowSize] = joints[j].Position.Y;
+								//m_Z_Window[m_FrameCounter % m_FilterWindowSize] = joints[j].Position.Z;
 
 								if ((((controlHand == RIGHT) && (j == JointType_WristRight)) ||
 									((controlHand == LEFT) && (j == JointType_WristLeft))) && 
 									(ConnectSocket != INVALID_SOCKET) && (m_FrameCounter % m_FilterWindowSize == 0))
 								{									
 									
-									float f_X = SimpleFilter::WindowFilter(m_X_Window, m_FilterWindowSize);
-									float f_Y = SimpleFilter::WindowFilter(m_Y_Window, m_FilterWindowSize);
-									float f_Z = SimpleFilter::WindowFilter(m_Z_Window, m_FilterWindowSize);
+									//float f_X = SimpleFilter::WindowFilter(m_X_Window, m_FilterWindowSize);
+									//float f_Y = SimpleFilter::WindowFilter(m_Y_Window, m_FilterWindowSize);
+									//float f_Z = SimpleFilter::WindowFilter(m_Z_Window, m_FilterWindowSize);
+									
 
 									int cs = VMGloveGetConnectionStatus(m_gloveH);
 									fprintf(stdout, "CONNSTATUS: %d\n", cs);
@@ -632,24 +633,25 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 									//100 is max value, corresponds to 0 rotation
 									double fingers[10];
 									VMGloveGetFingers(m_gloveH, fingers);
-									double close_thumbLower_threshold =  95.0;
-									double close_indexUpper_threshold =  99.0;
+									//double close_thumbLower_threshold =  90.0;
+									printf("INDEX_UPPER: %f\n INDEX_LOWER: %f\n MIDDLE_UPPER: %f\n MIDDLE_LOWER: %f\n\n", fingers[3], fingers[2], fingers[5], fingers[4]);
+									double close_indexUpper_threshold =  95.0;
 									double close_indexLower_threshold =  95.0;
-									double close_middleUpper_threshold = 99.0;
+									double close_middleUpper_threshold = 95.0;
 									double close_middleLower_threshold = 95.0;
 
-									double open_thumbLower_threshold =  30.0;
-									double open_indexUpper_threshold =  80.0;
-									double open_indexLower_threshold =  46.0;
-									double open_middleUpper_threshold = 80.0;
-									double open_middleLower_threshold = 80.0;
+									//double open_thumbLower_threshold =  50.0;
+									double open_indexUpper_threshold =  93.0;
+									double open_indexLower_threshold =  93.0;
+									double open_middleUpper_threshold = 93.0;
+									double open_middleLower_threshold = 93.0;
 
 									if (
-										fingers[1] < close_thumbLower_threshold &&
-										fingers[2] < close_indexUpper_threshold &&
-										fingers[3] < close_indexLower_threshold &&
-										fingers[4] < close_middleUpper_threshold &&
-										fingers[5] < close_middleLower_threshold  
+										//fingers[0] > close_thumbLower_threshold &&
+										fingers[3] > close_indexUpper_threshold &&
+										fingers[2] > close_indexLower_threshold &&
+										//fingers[5] > close_middleUpper_threshold &&
+										fingers[4] > close_middleLower_threshold  
 										) {
 
 										leftHandState =  HandState_Closed;
@@ -657,11 +659,11 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 
 									}
 									else if (
-										fingers[1] > open_thumbLower_threshold &&
-										fingers[2] > open_indexUpper_threshold &&
-										fingers[3] > open_indexLower_threshold &&
-										fingers[4] > open_middleUpper_threshold &&
-										fingers[5] > open_middleLower_threshold 
+										//fingers[0] < open_thumbLower_threshold &&
+										fingers[3] < open_indexUpper_threshold &&
+										fingers[2] < open_indexLower_threshold &&
+										//fingers[5] < open_middleUpper_threshold &&
+										fingers[4] < open_middleLower_threshold
 										) {
 										leftHandState =  HandState_Open;
 										rightHandState = HandState_Open;
@@ -689,18 +691,18 @@ void HandTracker::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 
 									if (m_handPoseTracker == NULL)
 									{
-										//m_handPoseTracker = new HandPose(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
-										//	quat1, quat2, quat3, quat4, quat1W, quat2W, quat3W, quat4W, handState);
-										m_handPoseTracker = new HandPose(f_X, f_Y, f_Z,
+										m_handPoseTracker = new HandPose(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
 											quat1, quat2, quat3, quat4, quat1W, quat2W, quat3W, quat4W, handState);
+										//m_handPoseTracker = new HandPose(f_X, f_Y, f_Z,
+										//	quat1, quat2, quat3, quat4, quat1W, quat2W, quat3W, quat4W, handState);
 
 									}
 									else
 									{
-										//m_handPoseTracker->update(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
-										//	quat1, quat2, quat3, quat4, quat1W, quat2W, quat3W, quat4W, handState);
-										m_handPoseTracker->update(f_X, f_Y, f_Z,
+										m_handPoseTracker->update(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z,
 											quat1, quat2, quat3, quat4, quat1W, quat2W, quat3W, quat4W, handState);
+										//m_handPoseTracker->update(f_X, f_Y, f_Z,
+										//	quat1, quat2, quat3, quat4, quat1W, quat2W, quat3W, quat4W, handState);
 
 									}
 

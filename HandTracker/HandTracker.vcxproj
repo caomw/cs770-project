@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="HandPose.cpp" />
     <ClCompile Include="HandTracker.cpp" />
+    <ClCompile Include="SimpleFilter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="app.ico" />
@@ -29,10 +30,10 @@
     <ResourceCompile Include="HandTracker.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Filter.h" />
     <ClInclude Include="HandPose.h" />
     <ClInclude Include="HandTracker.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SimpleFilter.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="VMG30.h" />
   </ItemGroup>

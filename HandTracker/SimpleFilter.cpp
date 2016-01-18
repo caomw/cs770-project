@@ -19,5 +19,6 @@ float SimpleFilter::Average(float* list, int windowSize) {
 }
 
 float SimpleFilter::WindowFilter(float* list, int windowSize) {
-	return Average(MedianFilter(list, windowSize), windowSize);
+	float av = Average(MedianFilter(list, windowSize), 3);
+	return av;
 }

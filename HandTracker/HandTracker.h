@@ -119,9 +119,9 @@ private:
 
 	short                   m_FilterWindowSize;
 	// windows for filtering
-	float*      m_X_Window;
-	float*      m_Y_Window;
-	float*      m_Z_Window;
+	//float*      m_X_Window;
+	//float*      m_Y_Window;
+	//float*      m_Z_Window;
 
     // Body/hand drawing
     ID2D1HwndRenderTarget*  m_pRenderTarget;

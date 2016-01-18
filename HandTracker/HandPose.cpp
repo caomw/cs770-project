@@ -21,7 +21,7 @@ HandPose::HandPose(float _pX, float _pY, float _pZ, float _oX, float _oY, float 
 	MASum[POS_X] = _pX * MOVING_AVERAGE_WINDOW;
 	MASum[POS_Y] = _pY * MOVING_AVERAGE_WINDOW;
 	MASum[POS_Z] = _pZ * MOVING_AVERAGE_WINDOW;
-
+	
 	for (int i = 0; i < MOVING_AVERAGE_WINDOW; i++)
 	{
 		MAQueue[POS_X].push(_pX);
@@ -69,6 +69,9 @@ void HandPose::update(float _pX, float _pY, float _pZ, float _oX, float _oY, flo
 	currentDisp[POS_Y] = poseInit[POS_Y] - (MASum[POS_Y] / MOVING_AVERAGE_WINDOW);
 	currentDisp[POS_Z] = poseInit[POS_Z] - (MASum[POS_Z] / MOVING_AVERAGE_WINDOW);
 
+	// std::cout << "_pZ = " << _pZ << std::endl;
+	// std::cout << "currentDisp[POS_Z] = " << currentDisp[POS_Z] << std::endl;
+
 	//use raw data for orientation quaternions:
 	currentDisp[ORI_X] = _oX;
 	currentDisp[ORI_Y] = _oY;
@@ -83,7 +86,7 @@ void HandPose::update(float _pX, float _pY, float _pZ, float _oX, float _oY, flo
 	MAQueue[POS_X].pop();
 	MAQueue[POS_Y].pop();
 	MAQueue[POS_Z].pop();
-
+	
 	MAQueue[POS_X].push(_pX);
 	MAQueue[POS_Y].push(_pY);
 	MAQueue[POS_Z].push(_pZ);
@@ -120,6 +123,7 @@ void HandPose::update(float _pX, float _pY, float _pZ, float _oX, float _oY, flo
 /// </summary>
 std::ostream& operator<<(std::ostream& os, const HandPose& dt)
 {
+	// std::cout << "Z DISP: " << dt.currentDisp[POS_Z];
 	os << std::fixed << std::setprecision(2) << dt.currentDisp[POS_X] << "," << dt.currentDisp[POS_Y] << "," << dt.currentDisp[POS_Z]
 		<< "," << std::setprecision(5) << dt.currentDisp[ORI_X] << "," << dt.currentDisp[ORI_Y] << "," << dt.currentDisp[ORI_Z]
 		<< "," << dt.currentDisp[ORI_W] << "," << dt.handState << "|" << dt.currentDisp[ORI_WX] << "," << dt.currentDisp[ORI_WY] << ","
