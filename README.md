@@ -1,3 +1,6 @@
+# Important
+This has had a few updates since the project... Code may or may not be in a working state.
+
 # cs770-project
 HCI project implementation
 
